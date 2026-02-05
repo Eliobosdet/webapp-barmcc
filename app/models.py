@@ -55,11 +55,33 @@ class Person(models.Model):
 
     # save capitalized
     def save(self, *args, **kwargs):
+        # 1. Capitalizzazione nomi (il tuo codice esistente)
         if self.first_name:
             self.first_name = " ".join(p.capitalize() for p in self.first_name.split())
         if self.last_name:
             self.last_name = " ".join(p.capitalize() for p in self.last_name.split())
+        
+        # 2. Salviamo prima il file originale
         super().save(*args, **kwargs)
+
+        # 3. Ora lo riapriamo e lo ridimensioniamo se esiste
+        if self.profile_picture:
+            try:
+                img_path = self.profile_picture.path
+                
+                # Controllo se il file esiste davvero su disco
+                if os.path.exists(img_path):
+                    with Image.open(img_path) as img:
+                        # Se l'immagine è più grande di 400x400, ridimensionala
+                        if img.height > 400 or img.width > 400:
+                            output_size = (400, 400)
+                            img.thumbnail(output_size)
+                            
+                            # Salva sovrascrivendo l'originale (ottimizzando)
+                            img.save(img_path, quality=70, optimize=True)
+            except Exception as e:
+                # Se qualcosa va storto col resize, non bloccare tutto, stampa solo l'errore
+                print(f"Errore resize immagine: {e}")
 
     @property
     def total_spent(self):
