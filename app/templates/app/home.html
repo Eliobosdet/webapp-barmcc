@@ -1,0 +1,100 @@
+{% extends "app/base.html" %}
+{% block title %}Dashboard - BARMCC{% endblock %}
+{% block content %}
+    <div class="container mt-4">
+        {% if is_partner %}
+            <div class="row">
+                <div class="col-12">
+                    <h1 class="mb-4 text-center">Bar MCC – Dashboard</h1>
+                    <div class="row mb-4">
+                        <div class="col-md-6 mb-3">
+                            <div class="card">
+                                <div class="card-body">
+                                    <a href="{% url 'app:order_list' %}" class="text-decoration-none">
+                                        <h5 class="card-title">Ordini totali</h5>
+                                        <p class="card-text display-6">{{ total_orders }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 ">
+                            <div class="card">
+                                <div class="card-body">
+                                    <a href="{% url 'app:order_list' %}?status=UNPAID"
+                                       class="text-decoration-none">
+                                        <h5 class="card-title">Ordini non pagati</h5>
+                                        <p class="card-text display-6">{{ unpaid_orders }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mb-4">
+                        <a href="{% url 'app:order_create' %}" class="btn btn-success btn-lg"><i class="bi bi-plus-circle"></i> Nuovo Ordine</a>
+                        <a href="{% url 'app:order_list' %}" class="btn border-success btn-lg"><i class="bi bi-list"></i> Lista Ordini</a>
+                        <a href="{% url 'app:person_list' %}" class="btn border-warning btn-lg"><i class="bi bi-people"></i> Visualizza Persone</a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <hr>
+        <div class="row mt-4">
+            <div class="col-12 text-center mb-4">
+                <h1 class="display-5 fw-bold">🏆 HUUUFF OF FAME 🏆</h1>
+                <p class="text-muted">I campioni attuali per categoria</p>
+            </div>
+            <div class="col-12">
+                {% for category, person in results.items %}
+                    {% if request.user.is_authenticated %}
+                        <a href="{% url 'app:profile' person.id %}" class="text-decoration-none">
+                        {% endif %}
+                        <div class="card mb-4 shadow-sm border-0 overflow-hidden"
+                             style="border-radius: 20px">
+                            <div class="row g-0 align-items-center p-3">
+                                <div class="col-4 text-center">
+                                    {% if person.profile_picture %}
+                                        <img src="{{ person.profile_picture.url }}"
+                                             class="img-fluid rounded-circle shadow-sm"
+                                             style="width: 100px;
+                                                    height: 100px;
+                                                    object-fit: cover;
+                                                    border: 3px solid #ffc107">
+                                    {% else %}
+                                        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm"
+                                             style="width: 100px;
+                                                    height: 100px;
+                                                    border: 3px solid #dee2e6">
+                                            <span class="h2 mb-0 text-secondary">{{ person.first_name|slice:":1" }}{{ person.last_name|slice:":1" }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-8 ps-3">
+                                    <div class="card-body p-0">
+                                        <h6 class="text-uppercase text-warning fw-bold mb-1"
+                                            style="letter-spacing: 1px">{{ category.name }}</h6>
+                                        <h3 class="card-title mb-1">
+                                            {% if person.nickname %}
+                                                {{ person.nickname }}
+                                            {% else %}
+                                                {{ person.first_name }} {{ person.last_name }}
+                                            {% endif %}
+                                        </h3>
+                                        <p class="card-text text-muted">
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                            Quota: <strong>{{ person.total_cat }} 🍌</strong>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% if request.user.is_authenticated %}</a>{% endif %}
+                {% empty %}
+                    <div class="col-12 text-center">
+                        <p class="alert alert-light">Nessun campione registrato al momento.</p>
+                    </div>
+                {% endfor %}
+                <hr>
+            </div>
+        </div>
+    </div>
+{% endblock %}

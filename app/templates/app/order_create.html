@@ -1,0 +1,110 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Nuovo Ordine (POS) - BARMCC{% endblock %}
+{% block extra_css %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'app/css/order_create.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="cart-overlay" id="cartOverlay" onclick="toggleCart(false)"></div>
+    <div class="pos-wrapper">
+        <div class="left-side h-100 d-flex flex-column position-relative">
+            <div class="p-2 border-bottom bg-white d-flex gap-2 align-items-center flex-shrink-0">
+                <div class="flex-grow-1">
+                    <select id="person-select"
+                            class="form-control"
+                            placeholder="Seleziona chi paga..."></select>
+                </div>
+                <button class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modalAddPerson">
+                    <i class="bi bi-person-plus-fill"></i>
+                </button>
+            </div>
+            <div class="category-scroll-container no-scrollbar">
+                <button class="category-tab active" onclick="filterCategory('all', this)">TUTTI</button>
+                {% for cat in categories %}
+                    <button class="category-tab" onclick="filterCategory('{{ cat.id }}', this)">{{ cat.name }}</button>
+                {% endfor %}
+            </div>
+            <div class="products-area no-scrollbar">
+                <div class="row g-2">
+                    {% for prod in products %}
+                        <div class="col-4 col-sm-3 col-lg-3 product-item"
+                             data-category="{{ prod.category.id }}">
+                            <div class="product-card shadow-sm"
+                                 onclick="addToCart('{{ prod.id }}', `{{ prod.name }}`, {{ prod.price_guest|stringformat:'.2f' }}, {{ prod.price_staff|stringformat:'.2f' }}, this)">
+                                {% if prod.category %}<span class="category-badge">{{ prod.category.name }}</span>{% endif %}
+                                <div class="product-name px-1 mt-3">{{ prod.name }}</div>
+                                <span class="badge bg-light text-dark border mt-1">{{ prod.price_guest }}€</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="right-side desktop-cart-wrapper h-100 border-start">
+            <form method="post" id="pos-form-desktop">
+                {% csrf_token %}
+                <div class="bg-light p-3 border-bottom">
+                    <h5 class="m-0">
+                        <i class="bi bi-cart3"></i> Riepilogo
+                    </h5>
+                </div>
+                <div id="cart-items-desktop" class="cart-items-scroll bg-white">
+                    <div class="text-center mt-5 text-muted">Carrello vuoto</div>
+                </div>
+                <div class="cart-footer-area bg-light">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="fw-bold">Totale:</span>
+                        <span class="fw-bold fs-4 text-primary" id="cart-total-desktop">0.00 €</span>
+                    </div>
+                    <textarea name="notes" class="form-control mb-2" rows="1" placeholder="Note..."></textarea>
+                    <div id="hidden-inputs-desktop"></div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fs-5">CONFERMA</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="mobile-cart-panel" id="mobileCartPanel">
+        <div class="mobile-cart-header" onclick="toggleCart()">
+            <div class="d-flex align-items-center gap-2">
+                <div class="bg-white text-dark rounded-circle d-flex align-items-center justify-content-center"
+                     style="width:30px;
+                            height:30px;
+                            font-weight:bold"
+                     id="mobile-badge-count">0</div>
+                <span class="fw-bold fs-5">Il tuo ordine</span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <span class="fw-bold fs-4" id="cart-total-mobile-header">0.00 €</span>
+                <i class="bi bi-chevron-up" id="mobileChevron"></i>
+            </div>
+        </div>
+        <form method="post"
+              id="pos-form-mobile"
+              class="flex-grow-1 d-flex flex-column overflow-hidden">
+            {% csrf_token %}
+            <div id="cart-items-mobile" class="flex-grow-1 overflow-auto p-3 bg-white"></div>
+            <div class="p-3 border-top bg-light flex-shrink-0">
+                <textarea name="notes"
+                          class="form-control mb-2"
+                          rows="2"
+                          placeholder="Note ordine..."></textarea>
+                <div id="hidden-inputs-mobile"></div>
+                <button type="submit" class="btn btn-success w-100 py-3 fs-4 fw-bold shadow">
+                    CONFERMA ORDINE <i class="bi bi-check-lg"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    {% include "app/includes/modal_add_person.html" %}
+{% endblock %}
+{% block extra_js %}
+    <script>
+        const API_URLS = { personCreate: "{% url 'app:api_person_create' %}" };
+        const PEOPLE_DATA = [{% for p in people %}{id: {{p.id}}, text: "{{p}}", is_staff: {% if p.is_partner %}true{% else %}false{% endif %}},{% endfor %}];
+    </script>
+    <script src="{% static 'app/js/order_create.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,218 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% block title %}Liturgia della Sospensione{% endblock %}
+{% block content %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap"
+          rel="stylesheet">
+    <style>
+    /* =========================================
+       FIX SFONDO INFINITO
+       ========================================= */
+    
+    /* Applichiamo lo sfondo al BODY, non al main. 
+       "fixed" fa sì che lo sfondo resti immobile mentre scrolli (effetto parallasse/finestra) 
+       e copra sempre il 100% della visuale, senza mai finire. */
+    body {
+        background: radial-gradient(circle at center, #2b1055 0%, #000000 100%) !important;
+        background-attachment: fixed !important;
+        background-size: cover !important;
+    }
+
+    /* Override per Party Mode sul body */
+    [data-theme="party"] body {
+        background: radial-gradient(circle at center, #ff00ff 0%, #1a0b2e 80%) !important;
+        background-attachment: fixed !important;
+    }
+
+    /* Il main ora deve essere trasparente per far vedere il body sotto */
+    main {
+        background: transparent !important;
+        min-height: 100vh; 
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        
+        /* Spaziatura per non sovrapporsi alla navbar e dare aria in fondo */
+        padding-top: 120px; 
+        padding-bottom: 100px;
+    }
+
+    /* =========================================
+       IL "SOLE POSTICCIO"
+       ========================================= */
+    .sun-container {
+        position: relative;
+        width: 250px;
+        height: 250px;
+        margin-bottom: 3rem;
+        z-index: 1;
+        /* Debug: sfondo scuro se l'immagine non carica */
+        background-color: rgba(0,0,0,0.5); 
+        border-radius: 50%;
+    }
+
+    .rotating-circle {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        
+        /* Bordo e alone */
+        border: 2px solid rgba(255, 193, 7, 0.5); 
+        box-shadow: 0 0 40px rgba(255, 193, 7, 0.4); 
+        
+        animation: celestial-spin 60s linear infinite;
+    }
+
+    [data-theme="party"] .rotating-circle {
+        border-color: rgba(0, 255, 204, 0.6);
+        box-shadow: 0 0 60px rgba(0, 255, 204, 0.7);
+    }
+
+    @keyframes celestial-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* =========================================
+       LA POESIA
+       ========================================= */
+    .poem-container {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+        padding: 0 20px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.95);
+        font-family: 'Cormorant Garamond', serif;
+    }
+
+    .stanza {
+        font-size: 1.4rem;
+        line-height: 1.5;
+        margin-bottom: 3rem; /* Aumentato un po' lo spazio tra le strofe */
+        font-weight: 300;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fade-in-up 2.5s ease forwards;
+    }
+
+    /* Ritardi apparizione */
+    .stanza:nth-child(1) { animation-delay: 0.3s; }
+    .stanza:nth-child(2) { animation-delay: 2.0s; }
+    .stanza:nth-child(3) { animation-delay: 4.0s; }
+    .stanza:nth-child(4) { animation-delay: 6.0s; }
+    .stanza:nth-child(5) { animation-delay: 8.0s; }
+    .stanza:nth-child(6) { animation-delay: 10.0s; }
+
+    .highlight {
+        font-style: italic;
+        color: var(--bs-warning);
+        font-weight: 400;
+    }
+    
+    [data-theme="party"] .highlight {
+        color: #00ffcc;
+        text-shadow: 0 0 8px #00ffcc;
+    }
+
+    @keyframes fade-in-up {
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Particelle sfondo */
+    .dust {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        background: white;
+        border-radius: 50%;
+        opacity: 0.3;
+        animation: float 15s infinite ease-in-out;
+        pointer-events: none;
+        /* Importante: fisse rispetto alla finestra per seguire lo sfondo */
+        position: fixed; 
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+        50% { opacity: 0.6; }
+        100% { transform: translateY(-150px) translateX(30px); opacity: 0; }
+    }
+    </style>
+    <div class="dust" style="top: 25%; left: 15%; animation-delay: 1s;"></div>
+    <div class="dust" style="top: 65%; left: 85%; animation-delay: 3s;"></div>
+    <div class="dust" style="top: 45%; left: 10%; animation-delay: 5s;"></div>
+    <div class="dust" style="top: 15%; left: 65%; animation-delay: 9s;"></div>
+    <div class="sun-container">
+        <img src="{% static 'app/img/sezionebrunch.png' %}"
+             alt="Sole Posticcio"
+             class="rotating-circle">
+    </div>
+    <div class="poem-container">
+        <p class="stanza">
+            Non è il pasto del dopo, ma del prima del dopo.
+            <br>
+            È il <span class="highlight">cuneo di luce</span> tra il notturno e il sonno,
+            <br>
+            la diga di profumi contro il vuoto che avanza.
+        </p>
+        <p class="stanza">
+            Tre figure, non più ragazzi, forse spettri leggeri,
+            <br>
+            ordinano con la gravità di chi semina
+            <br>
+            per un raccolto che non vedrà.
+        </p>
+        <p class="stanza">
+            Il piatto è un palinsesto: strati di tempo.
+            <br>
+            Il dolce fluire è memoria che si solidifica a contatto
+            <br>
+            con la pallida pagina del presente.
+            <br>
+            La geometria colorata: futuro ordinato,
+            <br>
+            consumato in anticipo.
+        </p>
+        <p class="stanza">
+            Masticano silenzi. Le parole si sono esaurite
+            <br>
+            nelle ore azzurre precedenti.
+            <br>
+            Ora resta solo il gesto, il suono del taglio
+            <br>
+            che separa, un <span class="highlight">sole posticcio e fragile</span>
+            <br>
+            per un giorno che non spunterà per loro.
+        </p>
+        <p class="stanza">
+            È la liturgia della sospensione.
+            <br>
+            Il locale è una navicella con orologi senza lancette.
+            <br>
+            Il cameriere, un sacerdote che offre
+            <br>
+            l’oblazione del calore: bevanda
+            <br>
+            per attraversare il deserto del sonno imminente.
+        </p>
+        <p class="stanza">
+            Poi, il congedo. Non un “a domani”,
+            <br>
+            ma un “fino al prossimo brunch”,
+            <br>
+            che è un modo diverso per dire:
+            <br>
+            finché la notte non avrà di nuovo bisogno
+            <br>
+            di questo suo strano, dorato,
+            <br>
+            <span class="highlight">assurdo epilogo</span>.
+        </p>
+    </div>
+{% endblock %}
+{% block footer %}{% endblock %}

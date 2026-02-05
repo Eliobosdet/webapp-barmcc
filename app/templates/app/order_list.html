@@ -1,0 +1,110 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Lista Ordini - BARMCC{% endblock %}
+{% block content %}
+    <div class="container mt-4">
+        <h1 class="mb-4">Lista ordini</h1>
+        <div class="card card-body mb-4 shadow-sm border-0 bg-light">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    {{ filter_form.person.label_tag }}
+                    {{ filter_form.person }}
+                </div>
+                <div class="col-md-3">
+                    {{ filter_form.status.label_tag }}
+                    {{ filter_form.status }}
+                </div>
+                <div class="col-md-3">
+                    {{ filter_form.date.label_tag }}
+                    {{ filter_form.date }}
+                </div>
+                <div class="col-md-2 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary w-100">Filtra</button>
+                    <a href="{% url 'app:order_list' %}" class="btn btn-outline-secondary">Reset</a>
+                </div>
+            </form>
+        </div>
+        <div class="d-grid gap-2 d-sm-flex mb-4">
+            <a href="{% url 'app:order_create' %}" class="btn btn-success px-4">+ Nuovo ordine</a>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr>
+                        {% comment %} <th>ID</th> {% endcomment %}
+                        <th>Persona</th>
+                        <th>Data</th>
+                        <th>Stato</th>
+                        <th class="text-end">Totale</th>
+                        {% comment %} <th class="text-end">Azioni</th> {% endcomment %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                        <tr class="table-row-link"
+                            onclick="window.location.href='{% url 'app:order_detail' order.id %}'">
+                            {% comment %} <td><strong>#{{ order.id }}</strong></td> {% endcomment %}
+                            <td>{{ order.person }}</td>
+                            <td>{{ order.created_at|date:"d/m/y H:i" }}</td>
+                            <td>
+                                {% if order.payment_status == 'PAID' %}
+                                    <span class="badge bg-success">{{ order.get_payment_status_display }}</span>
+                                {% else %}
+                                    <span class="badge bg-warning">{{ order.get_payment_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end fw-bold">€{{ order.total }}</td>
+                            {% comment %} <td class="text-end">
+                        <div class="btn-group">
+                            <a href="{% url 'app:order_delete' order.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
+                        </div>
+                            </td> {% endcomment %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-5">Nessun ordine trovato con questi criteri.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <hr>
+        <!-- buttons to export in csv/excel the orders-->
+        <div class="d-flex justify-content-end gap-2 mt-1">
+            <a href="{% url 'app:export_orders_api' %}?{{ request.GET.urlencode }}"
+               class="btn btn-outline-primary">
+                <i class="bi bi-file-earmark-spreadsheet"></i> Esporta EXCEL
+            </a>
+            {% comment %} <a href="{% url 'app:export_orders_excel' %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary"> {% endcomment %}
+            {% comment %} </a> {% endcomment %}
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. Inizializza TomSelect sul filtro Persona
+    const personSelect = document.getElementById('id_person');
+    if (personSelect) {
+        new TomSelect(personSelect, {
+            create: false,
+            sortField: {field: "text", order: "asc"},
+            placeholder: "Cerca una persona...",
+            allowEmptyOption: true,
+        });
+    }
+
+    // 2. Miglioramento estetico degli altri campi del form
+    // Django forms a volte non aggiungono 'form-control' automaticamente
+    const inputs = document.querySelectorAll('.card-body form input, .card-body form select');
+    inputs.forEach(el => {
+        if (!el.classList.contains('tomselected')) {
+            el.classList.add('form-control');
+        }
+        if (el.tagName === 'SELECT' && !el.id.includes('person')) {
+            el.classList.add('form-select');
+        }
+    });
+});
+    </script>
+{% endblock %}

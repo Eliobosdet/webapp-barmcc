@@ -1,0 +1,191 @@
+/* =========================================
+   1. LAYOUT GENERALE
+   ========================================= */
+body {
+    overflow: hidden; 
+    height: 100vh;
+    height: 100dvh;
+}
+
+.pos-wrapper {
+    position: fixed;
+    top: 70px; /* Spazio Navbar */
+    bottom: 0; left: 0; right: 0;
+    background-color: var(--body-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* =========================================
+   2. COMPONENTI UI
+   ========================================= */
+/* Categorie */
+.category-scroll-container {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding: 10px 5px;
+    background: var(--body-bg);
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    flex-shrink: 0;
+}
+
+.category-tab {
+    flex: 0 0 auto;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    background: var(--surface-bg);
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.category-tab.active {
+    background-color: var(--bs-primary);
+    color: #fff !important;
+    border-color: var(--bs-primary);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+[data-theme="party"] .category-tab.active {
+    background-color: var(--accent-color);
+    color: var(--accent-contrast) !important;
+    border-color: var(--accent-color);
+}
+
+/* Prodotti */
+.products-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    padding-bottom: 120px; /* Spazio extra per mobile */
+    -webkit-overflow-scrolling: touch;
+}
+
+.product-card {
+    cursor: pointer;
+    height: 100%;
+    min-height: 110px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--surface-bg);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.1s;
+}
+
+.product-card:active { transform: scale(0.95); }
+.product-card.flash-active { background-color: rgba(13, 110, 253, 0.2) !important; }
+[data-theme="party"] .product-card.flash-active { background-color: rgba(255, 0, 255, 0.4) !important; }
+
+.product-name {
+    font-size: 0.95rem; font-weight: 700; line-height: 1.2;
+    margin-bottom: 5px;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+.category-badge {
+    position: absolute; top: 5px; right: 5px;
+    font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+    background-color: rgba(0,0,0,0.08); color: var(--text-muted);
+    padding: 2px 6px; border-radius: 4px; pointer-events: none;
+    max-width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+[data-theme="party"] .category-badge {
+    background-color: rgba(255,255,255,0.1); color: #fff; border: 1px solid var(--accent-color);
+}
+
+/* =========================================
+   3. CARRELLO DESKTOP
+   ========================================= */
+.desktop-cart-wrapper {
+    height: 100%; 
+    overflow: hidden;
+    background: var(--surface-bg);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+#pos-form-desktop {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; 
+}
+
+#pos-form-desktop .cart-footer-area {
+    flex: 0 0 auto;
+    background: var(--surface-bg);
+    border-top: 1px solid var(--border-color);
+    padding: 15px;
+    z-index: 20;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.05);
+}
+
+.cart-items-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;    
+    padding: 10px;
+    background: #fff;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* =========================================
+   4. CARRELLO MOBILE (FIXED)
+   ========================================= */
+@media (max-width: 991px) {
+    .desktop-cart-wrapper { display: none !important; }
+
+    .mobile-cart-panel {
+        position: fixed; 
+        bottom: 0; left: 0; width: 100%;
+        height: 85vh;
+        background: var(--surface-bg); 
+        /* Z-Index molto alto per stare sopra all'overlay */
+        z-index: 1050; 
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 -10px 30px rgba(0,0,0,0.2);
+        transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        transform: translateY(calc(100% - 70px));
+        display: flex; flex-direction: column;
+    }
+    
+    .mobile-cart-panel.open { transform: translateY(0); }
+
+    .mobile-cart-header {
+        height: 70px; padding: 0 20px;
+        display: flex; align-items: center; justify-content: space-between;
+        background: var(--nav-bg); color: #fff;
+        border-radius: 20px 20px 0 0; cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .cart-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0,0,0,0.5); 
+        z-index: 1040; /* Sotto al cart panel (1050) ma sopra al wrapper (10) */
+        opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .cart-overlay.show { opacity: 1; pointer-events: auto; }
+}
+
+@media (min-width: 992px) {
+    .mobile-cart-panel, .cart-overlay { display: none !important; }
+    .pos-wrapper { flex-direction: row; }
+    .left-side { width: 65%; display: flex; flex-direction: column; overflow: hidden; }
+    .right-side { width: 35%; }
+}

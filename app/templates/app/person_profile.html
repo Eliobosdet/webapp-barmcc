@@ -1,0 +1,314 @@
+{% extends "app/base.html" %}
+{% block title %}I Miei Ordini - BARMCC{% endblock %}
+{% block content %}
+    <style>
+    .table-row-link { 
+        position: relative; 
+        cursor: pointer; 
+        /* AGGIUNGI QUESTA RIGA SOTTO: */
+        transform: scale(1); 
+    }
+    .table-row-link:hover { background-color: rgba(0,0,0,.05); }
+    </style>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+                {% if person %}
+                    <div class="card mb-4 bg-light">
+                        <div class="card-header text-white">
+                            <h5 class="mb-0">Dati profilo</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="d-inline-block position-relative mb-3">
+                                {% if person.profile_picture %}
+                                    <img src="{{ person.profile_picture.url }}"
+                                         alt="Foto Profilo"
+                                         class="img-thumbnail rounded-circle shadow-sm"
+                                         style="width: 100px;
+                                                height: 100px;
+                                                object-fit: cover;
+                                                border: 2px solid #007bff">
+                                {% else %}
+                                    <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm"
+                                         style="width: 100px;
+                                                height: 100px;
+                                                border: 2px solid #dee2e6">
+                                        <span style="font-size: 2rem;">{{ person.first_name|first }}{{ person.last_name|first }}</span>
+                                    </div>
+                                {% endif %}
+                                {% if request.user.person_profile.id == person.id %}
+                                    <div class="mt-2 d-flex justify-content-center gap-2">
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary p-2 lh-1 rounded-circle"
+                                                onclick="document.getElementById('profile_pic_input').click()"
+                                                title="Modifica">
+                                            <i class="bi bi-pencil-fill" style="font-size: 0.8rem;"></i>
+                                        </button>
+                                        {% if person.profile_picture %}
+                                            <form action="{% url 'app:delete_profile_picture' %}"
+                                                  method="POST"
+                                                  style="display: inline">
+                                                {% csrf_token %}
+                                                <button type="submit"
+                                                        class="btn btn-sm btn-outline-danger p-2 lh-1 rounded-circle"
+                                                        title="Rimuovi">
+                                                    <i class="bi bi-trash-fill" style="font-size: 0.8rem;"></i>
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                    </div>
+                                    <form action="{% url 'app:upload_profile_picture' %}"
+                                          method="POST"
+                                          enctype="multipart/form-data"
+                                          class="d-none">
+                                        {% csrf_token %}
+                                        <input type="file"
+                                               id="profile_pic_input"
+                                               name="profile_pic"
+                                               accept="image/*"
+                                               onchange="this.form.submit()">
+                                    </form>
+                                {% endif %}
+                            </div>
+                            <hr>
+                            <div class="mx-auto" style="max-width: 300px;">
+                                <div class="text-start p-2">
+                                    <p class="mb-1">
+                                        <strong>Username:</strong> {{ person.user.username }}
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>Tipo:</strong>
+                                        {% if person.is_partner %}
+                                            <span class="badge bg-success">Socio</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Ospite</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class ="text-start p-2">
+                                        <p class="mb-1">
+                                            <strong>Nome:</strong> {{ person.first_name }}
+                                        </p>
+                                        <p class="mb-1">
+                                            <strong>Cognome:</strong> {{ person.last_name }}
+                                        </p>
+                                        {% if person.nickname %}
+                                            <p class="mb-1">
+                                                <strong>Soprannome:</strong> {{ person.nickname }}
+                                            </p>
+                                        {% endif %}
+                                        {% if person.email %}
+                                            <p class="mb-1">
+                                                <strong>Email:</strong> {{ person.email }}
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                    {% if request.user.person_profile == person %}
+                                        <button type="button"
+                                                class="btn btn-sm btn-outline-primary p-2 lh-1 rounded-circle"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editProfileModal"
+                                                title="Modifica">
+                                            <i class="bi bi-pencil-fill"></i>
+                                        </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% if request.user.person_profile == person or request.user.person_profile.is_partner %}
+                        <hr>
+                        <h2 class="mb-3">Storico ordini</h2>
+                        {% if orders %}
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Persona</th>
+                                            <th>Data</th>
+                                            <th>Stato</th>
+                                            <th class="text-end">Totale</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in orders %}
+                                            <tr class="table-row-link position-relative">
+                                                <td>
+                                                    <a href="{% url 'app:order_detail' order.id %}"
+                                                       class="stretched-link text-decoration-none">#{{ order.id }}</a>
+                                                </td>
+                                                <td>{{ order.person }}</td>
+                                                <td>{{ order.created_at|date:"d/m/y H:i" }}</td>
+                                                <td>
+                                                    {% if order.payment_status == 'PAID' %}
+                                                        <span class="badge bg-success">{{ order.get_payment_status_display }}</span>
+                                                    {% else %}
+                                                        <span class="badge bg-warning">{{ order.get_payment_status_display }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td class="text-end">{{ order.total|floatformat:2 }} €</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% if orders.has_other_pages %}
+                                <nav aria-label="Navigazione pagine" class="mt-4">
+                                    <ul class="pagination justify-content-center">
+                                        {% if orders.has_previous %}
+                                            <li class="page-item">
+                                                <a class="page-link"
+                                                   href="?page={{ orders.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Precedente</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">Precedente</span>
+                                            </li>
+                                        {% endif %}
+                                        {% for i in orders.paginator.page_range %}
+                                            <li class="page-item {% if orders.number == i %}active{% endif %}">
+                                                <a class="page-link"
+                                                   href="?page={{ i }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ i }}</a>
+                                            </li>
+                                        {% endfor %}
+                                        {% if orders.has_next %}
+                                            <li class="page-item">
+                                                <a class="page-link"
+                                                   href="?page={{ orders.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">Successiva</a>
+                                            </li>
+                                        {% else %}
+                                            <li class="page-item disabled">
+                                                <span class="page-link">Successiva</span>
+                                            </li>
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                                <div class="text-center text-muted small mb-4">Pagina {{ orders.number }} di {{ orders.paginator.num_pages }}</div>
+                            {% endif %}
+                        {% else %}
+                            <p class="text-muted">Nessun ordine trovato per questo profilo.</p>
+                        {% endif %}
+                        <hr>
+                        <h2 class="mb-3">Riepilogo Spese</h2>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <div class="card text-center p-3 fs-4 fw-bold h-100">
+                                    <div class="card-body position-relative">
+                                        {% if user.person_profile.is_partner %}
+                                            <a href="{% url 'app:order_list' %}?person={{ person.id }}&status=UNPAID"
+                                               class="stretched-link text-decoration-none"></a>
+                                        {% endif %}
+                                        <div class="text-muted fs-6 mb-2">Ancora da saldare</div>
+                                        {{ person.total_unpaid|floatformat:2 }} €
+                                        {% if user.person_profile.is_partner %}</a>{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center p-3 fs-4 fw-bold h-100">
+                                <div class="card-body">
+                                    <div class="text-muted fs-6 mb-2">Spese Mensili</div>
+                                    {{ total_spent_month|floatformat:2 }} €
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center p-3 fs-4 fw-bold h-100">
+                                <div class="card-body">
+                                    <div class="text-muted fs-6 mb-2">Spese Totali (€)</div>
+                                    {{ person.total_spent|floatformat:2 }} €
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-center p-3 fs-4 fw-bold h-100">
+                                <div class="card-body">
+                                    <div class="text-muted fs-6 mb-2">Spese Totali (%)</div>
+                                    {{ person.total_spent_percentage|floatformat:2 }} %
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                    <h2 class="mb-3">Statistiche Ordini</h2>
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5>Classifica Consumi Personali</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Prodotto</th>
+                                        <th>Categoria</th>
+                                        <th class="text-end">Quantità</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in consumption_stats %}
+                                        <tr>
+                                            <td>{{ item.name }}</td>
+                                            <td>{{ item.category }}</td>
+                                            <td class="text-end">
+                                                <strong>{{ item.consumed_quantity }}</strong>
+                                            </td>
+                                        </tr>
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="2" class="text-muted">Nessuna consumazione registrata.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">Profilo non trovato.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<div class="modal fade"
+     id="editProfileModal"
+     tabindex="-1"
+     aria-labelledby="editProfileModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="editProfileModalLabel">Modifica Dati Personali</h5>
+                <button type="button"
+                        class="btn-close btn-close-white"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'app:update_profile' person.id %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                        </div>
+                    {% endfor %}
+                    <div class="mt-4 mb-2">
+                        <a type="button"
+                           class="btn btn-outline-primary"
+                           href="{% url 'app:force_password_change' %}">Cambia Password</a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva Modifiche</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

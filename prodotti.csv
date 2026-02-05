@@ -1,0 +1,32 @@
+Prodotto,Categoria,Prezzo Guest,Prezzo Staff
+Gin tonic,Drinks,4,"3,5"
+Gin lemon,Drinks,4,"3,5"
+Gin pompelmo,Drinks,4,"3,5"
+Vodka tonic,Drinks,4,"3,5"
+Vodka lemon,Drinks,4,"3,5"
+Vodka pompelmo,Drinks,4,"3,5"
+Vodka redbull,Drinks,4,"3,5"
+Cuba libre,Drinks,4,"3,5"
+Jager bomb,Drinks,"4,5",4
+Birra Spina Media Premium,Birra,"4",3,50
+Birra Spina Piccola Premium,Birra ,"3",2,50
+Birra Spina Media,Birra,"3,5",3
+Birra Spina Piccola ,Birra ,"2,5",2
+Birra Vetro Media,Birra,"3,5",3
+Birra Vetro Piccola ,Birra ,"2,5",2
+Coca cola,Analcolici,0,5,"0,5"
+Succo alla pera,Analcolici,0,5,"0,5"
+Redbull,Analcolici,0,5,"0,5"
+Multivitaminico,Analcolici,0,5,"0,5"
+Rum e Pera,Shots,1,"1"
+Tequila,Shots,1,"1"
+Gin,Shots,1,"1"
+Vodka,Shots,1,"1"
+Nocciolino,Shots,"1",1
+Montenegro,Shots,1,1
+Amaro del capo,Shots,1,1
+Jagermaister,Shots,1,1
+Nocciolino,Amari,"2,5",2
+Montenegro,Amari,"2,5",2
+Amaro del capo,Amari,"2,5",2
+Jagermaister,Amari,"2,5",2

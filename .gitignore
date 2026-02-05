@@ -1,0 +1,75 @@
+# ========================
+# 1. PYTHON & SISTEMA
+# ========================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C libraries
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ========================
+# 2. DJANGO SPECIFICI
+# ========================
+# Database Locale: NON caricarlo mai se non vuoi sovrascrivere
+# i dati del server con quelli di test del tuo PC.
+db.sqlite3
+db.sqlite3-journal
+
+# File statici raccolti (generati da collectstatic sul server)
+staticfiles/
+# Cartella media (i file caricati dagli utenti non vanno su git)
+media/
+
+# ========================
+# 3. AMBIENTI VIRTUALI (VENV)
+# ========================
+# Escludiamo le cartelle pesanti delle librerie
+venv/
+env/
+ENV/
+.env/
+.venv/
+
+# ========================
+# 4. SICUREZZA & VARIABILI D'AMBIENTE
+# ========================
+# CRUCIALE: Contiene la SECRET_KEY e password.
+# Questo file deve esistere sul server e sul tuo PC, ma NON su GitHub.
+.env
+.env.local
+.env.*
+
+# ========================
+# 5. IDE & EDITOR (File di configurazione personali)
+# ========================
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ========================
+# 6. SISTEMA OPERATIVO
+# ========================
+.DS_Store
+Thumbs.db
+Desktop.ini

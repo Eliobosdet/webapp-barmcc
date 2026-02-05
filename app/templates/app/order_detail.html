@@ -1,0 +1,197 @@
+{% extends "app/base.html" %}
+{% block title %}Order #{{ order.id }} - BARMCC{% endblock %}
+{% block content %}
+    <style>
+    .order-detail-label {
+        font-weight: 600;
+        color: #343a40;
+    }
+    .btn-square-action {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        border-radius: 10px;
+        text-decoration: none;
+        color: #fff;
+        transition: background-color 0.2s, transform 0.1s;
+        height: 100%;
+    }
+    .btn-square-action i {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+    .btn-square-action span {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    .btn-square-action:hover {
+        transform: translateY(-3px);
+    }
+    .btn-pay {
+        background-color: #28a745;
+    }
+    .btn-pay:hover {
+        background-color: #218838;
+    }
+    .btn-unpay {
+        background-color: #ffc107;
+    }
+    .btn-unpay:hover {
+        background-color: #e0a800;
+    }
+    .btn-delete {
+        background-color: #dc3545;
+    }
+    .btn-delete:hover {
+        background-color: #c82333;
+    }
+    .btn-back {
+        background-color: #6c757d;
+    }
+    .btn-back:hover {
+        background-color: #5a6268;
+    }
+    </style>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="mb-3">Ordine numero #{{ order.id }}</h1>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <p class="mb-2">
+                            <strong class="order-detail-label">Pagante:</strong> {{ order.person }}
+                        </p>
+                        <p class="mb-2">
+                            <strong class="order-detail-label">Data e Ora:</strong> {{ order.created_at }}
+                        </p>
+                        <p class="mb-2">
+                            <strong class="order-detail-label">Stato pagamento:</strong> {{ order.get_payment_status_display }}
+                        </p>
+                        <p class="mb-2">
+                            <strong class="order-detail-label">Metodo di pagamento:</strong> {{ order.get_payment_method_display }}
+                        </p>
+                        <p class="mb-2">
+                            <strong class="order-detail-label">Totale:</strong> €{{ order.total }}
+                        </p>
+                        <p class="mb-0 text-muted">
+                            (Inserito da:</strong> {{ order.created_by }})
+                        </p>
+                    </div>
+                </div>
+                <h2 class="mb-3">Articoli dell'ordine:</h2>
+                <div class="table-responsive mb-4">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Prodotto</th>
+                                <th class="text-end">Prezzo</th>
+                                <th class="text-end">Q.tà</th>
+                                <th class="text-end">Subtot.</th>
+                                <th class="text-end">Offerto</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td class="text-end">€{{ item.price_at_order }}</td>
+                                    <td class="text-end">{{ item.quantity }}</td>
+                                    <td class="text-end">€{{ item.subtotal }}</td>
+                                    {% if item.offered_to %}
+                                        <td class="text-end">a: {{ item.offered_to.first_name }}</td>
+                                    {% else %}
+                                        <td class="text-end">No</td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <p>
+                            <strong>Note:</strong> {{ order.notes }}
+                        </p>
+                    </div>
+                </div>
+                {% if user.is_authenticated and user.person_profile.is_partner %}
+                    <div class="mt-5">
+                        <h4 class="mb-3">Azioni Rapide</h4>
+                        {% if order.payment_status != 'PAID' %}
+                            <div class="row mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label for="metodo_pagamento_select" class="form-label fw-bold text-muted">
+                                        <i class="bi bi-wallet2"></i> Seleziona metodo prima di pagare:
+                                    </label>
+                                    <select name="metodo_pagamento"
+                                            id="metodo_pagamento_select"
+                                            class="form-select form-select-lg"
+                                            form="form-paga">
+                                        <option value="Contanti" selected>Contanti</option>
+                                        <option value="Paypal">Paypal</option>
+                                    </select>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3">
+                                {% if order.payment_status != 'PAID' %}
+                                    <form action="{% url 'app:order_mark_paid' order.id %}"
+                                          method="POST"
+                                          id="form-paga"
+                                          style="height: 100%">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-square-action btn-pay w-100">
+                                            <i class="bi bi-cash-coin"></i>
+                                            <span>CONFERMA
+                                                <br>
+                                            PAGAMENTO</span>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <a href="{% url 'app:order_mark_paid' order.id %}"
+                                       class="btn-square-action btn-unpay">
+                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                        <span>Segna
+                                            <br>
+                                        NON Pagato</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'app:order_delete' order.id %}"
+                                   class="btn-square-action btn-delete"
+                                   onclick="return confirm('Sei sicuro di voler eliminare questo ordine?');">
+                                    <i class="bi bi-trash-fill"></i>
+                                    <span>Elimina
+                                        <br>
+                                    Ordine</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'app:home' %}"
+                                   class="btn-square-action btn-back"
+                                   style="background-color: #495057">
+                                    <i class="bi bi-house-door-fill"></i>
+                                    <span>Menu
+                                        <br>
+                                    Principale</span>
+                                </a>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <a href="{% url 'app:order_list' %}" class="btn-square-action btn-back">
+                                    <i class="bi bi-list-ul"></i>
+                                    <span>Torna
+                                        <br>
+                                    alla Lista</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

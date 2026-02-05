@@ -1,0 +1,42 @@
+{% extends "app/base.html" %}
+{% block title %}Menù {{ current_category.name }} - BARMCC{% endblock %}
+{% block content %}
+    <div class="container mt-4">
+        <div class="d-flex align-items-center mb-4">
+            <a href="{% url 'app:category_list' %}"
+               class="btn btn-outline-secondary me-3">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <h1 class="mb-0">
+                {% if current_category %}
+                    {{ current_category.name }}
+                {% else %}
+                    Tutti i prodotti
+                {% endif %}
+            </h1>
+        </div>
+        <div class="row">
+            {% for product in products %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ product.name }}</h5>
+                            <p class="card-text fs-5">
+                                <span class="badge border">€ {{ product.price_guest }}</span>
+                            </p>
+                        </div>
+                        {% if user.is_authenticated %}
+                            <div class="card-footer bg-transparent border-top-0">
+                                <small class="text-muted">Staff: <span>€ {{ product.price_staff }}</span></small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info">Nessun prodotto in questa categoria.</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
