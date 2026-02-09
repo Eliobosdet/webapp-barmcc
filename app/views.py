@@ -160,6 +160,14 @@ def order_create(request):
 
         print(f"Prodotti validi filtrati: {valid_products}")  # Debug
 
+        if not person_id:
+            messages.error(request, "Devi selezionare una persona per l'ordine!")
+            return render(
+                request,
+                "app/order_create.html",
+                {"people": people, "products": products},
+            )
+        
         # Se dopo il filtro la lista è veramente vuota
         if not valid_products:
             messages.error(request, "Non hai selezionato nessun prodotto!")
@@ -172,13 +180,6 @@ def order_create(request):
                 },
             )
 
-        if not person_id:
-            messages.error(request, "Devi selezionare una persona per l'ordine!")
-            return render(
-                request,
-                "app/order_create.html",
-                {"people": people, "products": products},
-            )
 
         try:
             with transaction.atomic():

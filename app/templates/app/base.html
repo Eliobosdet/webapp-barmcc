@@ -31,118 +31,143 @@
             </div>
         </div>
         <nav class="navbar navbar-expand-lg shadow-sm navbase sticky-top">
-    <div class="container-fluid">
-        
-        <a class="navbar-brand fw-bold logo d-flex align-items-center me-0 mt-1" href="{% url 'app:home' %}">
-            <i class="bi bi-cup-straw fs-4 me-2"></i>
-            <span class="d-inline-block">BARMCC</span>
-        </a>
-
-        <div class="d-flex align-items-center gap-3 ms-auto ms-lg-0 order-lg-2">
-            
-            <!-- Party mode toggle -->
-            <div class="cp-wrapper mt-2">
-                <div class="cp-toggle-container">
-                    <input type="checkbox" id="partyToggler" class="cp-toggle-input" {% if PARTY_MODE_ACTIVE %}checked{% endif %}>
-                    <label for="partyToggler" class="cp-toggle-btn mt-0">
-                        <span class="cp-icon">🍌</span>
-                    </label>
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold logo d-flex align-items-center me-0 mt-1"
+                   href="{% url 'app:home' %}">
+                    <i class="bi bi-cup-straw fs-4 me-2"></i>
+                    <span class="d-inline-block">BARMCC</span>
+                </a>
+                <div class="d-flex align-items-center gap-3 ms-auto ms-lg-0 order-lg-2">
+                    <!-- Party mode toggle -->
+                    <div class="cp-wrapper mt-2">
+                        <div class="cp-toggle-container">
+                            <input type="checkbox"
+                                   id="partyToggler"
+                                   class="cp-toggle-input"
+                                   {% if PARTY_MODE_ACTIVE %}checked{% endif %}>
+                            <label for="partyToggler" class="cp-toggle-btn mt-0">
+                                <span class="cp-icon">🍌</span>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- Dropdown utente VISIBILE SU TUTTI I DISPOSITIVI -->
+                    {% if user.is_authenticated %}
+                        <div class="dropdown d-none d-lg-block">
+                            <!-- Visibile solo su desktop -->
+                            <a class="nav-link dropdown-toggle border border-secondary rounded-pill px-3 py-1 d-flex align-items-center gap-2"
+                               href="#"
+                               role="button"
+                               data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle fs-5"></i>
+                                <span class="fw-semibold">{{ user.username|truncatechars:15 }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+                                {% if user.person_profile %}
+                                    <li>
+                                        <a class="dropdown-item py-2"
+                                           href="{% url 'app:profile' user.person_profile.id %}"><i class="bi bi-person-badge me-2"></i> Profilo</a>
+                                    </li>
+                                {% endif %}
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-danger py-2" href="{% url 'app:logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+                                </li>
+                            </ul>
+                        </div>
+                    {% else %}
+                        <a class="btn btn-warning rounded-pill px-4 fw-bold d-none d-lg-inline-flex"
+                           href="{% url 'app:login' %}">Accedi</a>
+                    {% endif %}
+                    <!-- Bottone hamburger menu -->
+                    <button class="navbar-toggler border-0 p-1"
+                            type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#navbarNav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
+                <!-- Menu collassabile (mobile) -->
+                <div class="collapse navbar-collapse mt-2 mt-lg-0 order-lg-1 w-100 w-lg-auto"
+                     id="navbarNav">
+                    <hr class="d-lg-none my-2 border-secondary opacity-25">
+                    <ul class="navbar-nav me-auto mx-lg-4 gap-lg-3 align-items-lg-center">
+                        <li class="nav-item">
+                            <a class="nav-link px-3 px-lg-2" href="{% url 'app:home' %}"><i class="bi bi-house-door me-2"></i> Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-3 px-lg-0" href="{% url 'app:category_list' %}"><i class="bi bi-book me-2"></i> Menù</a>
+                        </li>
+                        {% if user.person_profile.is_partner %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-success fw-bold px-3 px-lg-2"
+                                   href="#"
+                                   id="gestioneDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="bi bi-shield-lock me-2 "></i> Gestione
+                                </a>
+                                <ul class="dropdown-menu shadow border-success border-opacity-25 mt-2"
+                                    aria-labelledby="gestioneDropdown">
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'app:order_create' %}"><i class="bi bi-plus-square me-2 text-success"></i> Nuovo Ordine</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'app:order_list' %}"><i class="bi bi-list-ul me-2 text-success"></i> Lista Ordini</a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item py-2" href="{% url 'app:person_list' %}"><i class="bi bi-people me-2 text-success"></i> Elenco Persone</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
+                        <!-- AGGIUNGI QUESTA SEZIONE PER IL MOBILE -->
+                        <li class="nav-item d-lg-none">
+                            <hr class="my-2 border-secondary opacity-25">
+                        </li>
+                        {% if user.is_authenticated %}
+                            <li class="nav-item d-lg-none px-3 mb-2">
+                                <span class="small nav-link">Accesso come</span>
+                                <div class="d-flex align-items-center gap-2 mt-1">
+                                    <i class="bi bi-person-circle fs-4 nav-link"></i>
+                                    <div class="nav-link">
+                                        <span class="fw-bold">{{ user.username }}</span>
+                                        {% if user.person_profile %}
+                                            <br>
+                                            <small class="text-invert">{{ user.person_profile.get_role_display }}</small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </li>
+                            {% if user.person_profile %}
+                                <li class="nav-item d-lg-none">
+                                    <a class="nav-link px-3"
+                                       href="{% url 'app:profile' user.person_profile.id %}">
+                                        <i class="bi bi-person-badge me-2"></i> Profilo
+                                    </a>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link px-3 text-danger" href="{% url 'app:logout' %}">
+                                    <i class="bi bi-box-arrow-right me-2"></i> Logout
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item d-lg-none">
+                                <a class="nav-link px-3 text-warning" href="{% url 'app:login' %}">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i> Accedi
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
                 </div>
             </div>
-
-            <!-- Dropdown utente VISIBILE SU TUTTI I DISPOSITIVI -->
-            {% if user.is_authenticated %}
-            <div class="dropdown d-none d-lg-block"> <!-- Visibile solo su desktop -->
-                <a class="nav-link dropdown-toggle border border-secondary rounded-pill px-3 py-1 d-flex align-items-center gap-2" href="#" role="button" data-bs-toggle="dropdown">
-                    <i class="bi bi-person-circle fs-5"></i>
-                    <span class="fw-semibold">{{ user.username|truncatechars:15 }}</span>
-                </a>
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
-                    {% if user.person_profile %}
-                        <li><a class="dropdown-item py-2" href="{% url 'app:profile' user.person_profile.id %}"><i class="bi bi-person-badge me-2"></i> Profilo</a></li>
-                    {% endif %}
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger py-2" href="{% url 'app:logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
-                </ul>
-            </div>
-            {% else %}
-                <a class="btn btn-warning rounded-pill px-4 fw-bold d-none d-lg-inline-flex" href="{% url 'app:login' %}">Accedi</a>
-            {% endif %}
-
-            <!-- Bottone hamburger menu -->
-            <button class="navbar-toggler border-0 p-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-        </div>
-
-        <!-- Menu collassabile (mobile) -->
-        <div class="collapse navbar-collapse mt-2 mt-lg-0 order-lg-1 w-100 w-lg-auto" id="navbarNav">
-            <hr class="d-lg-none my-2 border-secondary opacity-25">
-            <ul class="navbar-nav me-auto mx-lg-4 gap-lg-3 align-items-lg-center">
-                <li class="nav-item">
-                    <a class="nav-link px-3 px-lg-2" href="{% url 'app:home' %}"><i class="bi bi-house-door me-2"></i> Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link px-3 px-lg-0" href="{% url 'app:category_list' %}"><i class="bi bi-book me-2"></i> Menù</a>
-                </li>
-                {% if user.person_profile.is_partner %}
-                 <li class="nav-item dropdown">
-                     <a class="nav-link dropdown-toggle text-success fw-bold px-3 px-lg-2" href="#" id="gestioneDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-shield-lock me-2 "></i> Gestione
-                    </a>
-                    <ul class="dropdown-menu shadow border-success border-opacity-25 mt-2" aria-labelledby="gestioneDropdown">
-                         <li><a class="dropdown-item py-2" href="{% url 'app:order_create' %}"><i class="bi bi-plus-square me-2 text-success"></i> Nuovo Ordine</a></li>
-                         <li><a class="dropdown-item py-2" href="{% url 'app:order_list' %}"><i class="bi bi-list-ul me-2 text-success"></i> Lista Ordini</a></li>
-                         <li><hr class="dropdown-divider"></li>
-                         <li><a class="dropdown-item py-2" href="{% url 'app:person_list' %}"><i class="bi bi-people me-2 text-success"></i> Elenco Persone</a></li>
-                    </ul>
-                 </li>
-                 {% endif %}
-                 
-                 <!-- AGGIUNGI QUESTA SEZIONE PER IL MOBILE -->
-                 <li class="nav-item d-lg-none">
-                    <hr class="my-2 border-secondary opacity-25">
-                </li>
-
-                {% if user.is_authenticated %}
-                    <li class="nav-item d-lg-none px-3 mb-2">
-                        <span class="small nav-link">Accesso come</span>
-                        <div class="d-flex align-items-center gap-2 mt-1">
-                            <i class="bi bi-person-circle fs-4 nav-link"></i>
-                            <div class="nav-link">
-                                <span class="fw-bold">{{ user.username }}</span>
-                                {% if user.person_profile %}
-                                    <br><small class="text-invert">{{ user.person_profile.get_role_display }}</small>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </li>
-
-                    {% if user.person_profile %}
-                    <li class="nav-item d-lg-none">
-                        <a class="nav-link px-3" href="{% url 'app:profile' user.person_profile.id %}">
-                            <i class="bi bi-person-badge me-2"></i> Profilo
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    <li class="nav-item d-lg-none">
-                        <a class="nav-link px-3 text-danger" href="{% url 'app:logout' %}">
-                            <i class="bi bi-box-arrow-right me-2"></i> Logout
-                        </a>
-                    </li>
-
-                {% else %}
-                    <li class="nav-item d-lg-none">
-                        <a class="nav-link px-3 text-warning" href="{% url 'app:login' %}">
-                            <i class="bi bi-box-arrow-in-right me-2"></i> Accedi
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
+        </nav>
         <main class="py-4">
             {% block content %}{% endblock %}
         </main>
@@ -164,6 +189,42 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary w-100" data-bs-dismiss="modal">Ok</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade"
+             id="partyConfirmModal"
+             tabindex="-1"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-warning border-2">
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title fw-bold">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Attenzione!
+                        </h5>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <p class="fs-5 mb-3">
+                            Stai per attivare la <strong>Modalità College Party</strong>.
+                        </p>
+                        <p class="small text-muted">
+                            Questo scatenerà banane volanti e musica molesta.
+                            <br>
+                            Sei psicologicamente pronto?
+                        </p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button"
+                                class="btn btn-outline-secondary px-4"
+                                data-bs-dismiss="modal">Non ancora</button>
+                        <button type="button"
+                                class="btn btn-warning fw-bold px-4"
+                                id="confirmPartyBtn">Sì, SCATENA L'INFERNO! 🍌</button>
                     </div>
                 </div>
             </div>
@@ -314,52 +375,74 @@
         setInterval(syncFromServer, 5000);
         syncFromServer();
 
-        // --- Evento Click/Change sul Toggle ---
-        // Qui gestiamo il "blocco simulato"
-        partyToggler.addEventListener('click', function (e) {
-            const wantsActive = this.checked; // Se ho cliccato ed era acceso, ora wantsActive è false (voglio spegnere)
+        const confirmModalEl = document.getElementById('partyConfirmModal');
+        const confirmModal = new bootstrap.Modal(confirmModalEl);
+        const confirmBtn = document.getElementById('confirmPartyBtn');
 
-            // CONTROLLO PREVENTIVO LATO CLIENT
-            // Se l'utente vuole spegnere (wantsActive == false) MA è bloccato (isPartyLocked == true)
-            if (!wantsActive && isPartyLocked) {
-                e.preventDefault(); // Blocca il cambio visivo della checkbox immediatamente
-                this.checked = true; // Forza a rimanere acceso
-                
-                // Feedback Immediato
-                alert("⚠️ Il college party deve durare almeno 60 secondi! Non fare il guastafeste.");
-                
-                // Facciamo tremare la banana per feedback visivo che "non si può fare"
-                const label = document.querySelector('.cp-toggle-btn');
-                if(label) {
-                    label.style.animation = 'shake 0.5s';
-                    setTimeout(() => label.style.animation = '', 500);
-                }
-                return; // Non chiamiamo nemmeno il server
-            }
-
-            // Se arriviamo qui, l'utente può legittimamente provare a cambiare stato
+        // Funzione helper per fare la chiamata al server (così non ripetiamo codice)
+        function sendPartyToggleRequest(activeState) {
             fetch('/api/set-party-mode/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken')
                 },
-                body: JSON.stringify({ active: wantsActive })
+                body: JSON.stringify({ active: activeState })
             })
             .then(response => response.json())
             .then(data => {
                 applyParty(data.active, data.locked);
-
-                // Controllo di sicurezza lato server (caso raro di concorrenza)
-                if (!wantsActive && data.active && data.locked) {
+                if (!activeState && data.active && data.locked) {
                     alert("⚠️ La festa deve durare almeno 60 secondi! Non fare il guastafeste.");
                 }
             })
             .catch(err => {
                 console.error("Toggle error:", err);
-                this.checked = !wantsActive; // Rollback in caso di errore rete
+                // Rollback visivo in caso di errore
+                partyToggler.checked = !activeState; 
             });
-        });
+        }
+
+        // --- Evento Click/Change sul Toggle ---
+        // Qui gestiamo il "blocco simulato"
+        // --- Gestione Click sul Toggle ---
+    partyToggler.addEventListener('click', function (e) {
+        const wantsActive = this.checked; 
+
+        if (wantsActive) {
+            // CASO 1: Voglio ATTIVARE -> Fermati e chiedi conferma
+            e.preventDefault(); // Blocca il check visivo della checkbox
+            this.checked = false; // Assicura che resti spento
+            confirmModal.show(); // Mostra il modale
+        } else {
+            // CASO 2: Voglio DISATTIVARE -> Controllo il blocco (logica esistente)
+            if (isPartyLocked) {
+                e.preventDefault();
+                this.checked = true; // Forza on
+                alert("⚠️ Il college party deve durare almeno 60 secondi! Non fare il guastafeste.");
+                
+                // Animazione shake
+                const label = document.querySelector('.cp-toggle-btn');
+                if(label) {
+                    label.style.animation = 'shake 0.5s';
+                    setTimeout(() => label.style.animation = '', 500);
+                }
+                return;
+            }
+            // Se non è bloccato, procedi a spegnere
+            sendPartyToggleRequest(false);
+        }
+    });
+
+    // --- Gestione Click sul Bottone "Sì, SCATENA L'INFERNO" ---
+    confirmBtn.addEventListener('click', function() {
+        // 1. Chiudi il modale
+        confirmModal.hide();
+        // 2. Accendi visivamente il toggle (perché l'utente ha detto sì)
+        partyToggler.checked = true;
+        // 3. Invia la richiesta al server
+        sendPartyToggleRequest(true);
+    });
     });
         </script>
         {% block extra_js %}

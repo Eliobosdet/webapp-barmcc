@@ -29,7 +29,16 @@
                 {% endfor %}
             </div>
             <div class="products-area no-scrollbar">
-                <div class="row g-2">
+                <div id="select-payer-warning"
+                     class="text-center position-absolute top-50 start-50 translate-middle w-100 px-3">
+                    <i class="bi bi-person-exclamation fs-1 text-muted"></i>
+                    <h4 class="text-muted mt-3">
+                        Seleziona prima il pagante
+                        <br>
+                        per visualizzare i prodotti
+                    </h4>
+                </div>
+                <div class="row g-2 d-none" id="products-grid">
                     {% for prod in products %}
                         <div class="col-4 col-sm-3 col-lg-3 product-item"
                              data-category="{{ prod.category.id }}">
@@ -37,7 +46,11 @@
                                  onclick="addToCart('{{ prod.id }}', `{{ prod.name }}`, {{ prod.price_guest|stringformat:'.2f' }}, {{ prod.price_staff|stringformat:'.2f' }}, this)">
                                 {% if prod.category %}<span class="category-badge">{{ prod.category.name }}</span>{% endif %}
                                 <div class="product-name px-1 mt-3">{{ prod.name }}</div>
-                                <span class="badge bg-light text-dark border mt-1">{{ prod.price_guest }}€</span>
+                                <span class="badge bg-warning text-dark border mt-1 price-badge"
+                                      data-guest="{{ prod.price_guest|stringformat:'.2f' }}"
+                                      data-staff="{{ prod.price_staff|stringformat:'.2f' }}">
+                                    {{ prod.price_staff }}€
+                                </span>
                             </div>
                         </div>
                     {% endfor %}
