@@ -24,59 +24,86 @@
                 </div>
             </form>
         </div>
-        <div class="d-grid gap-2 d-sm-flex mb-4">
-            <a href="{% url 'app:order_create' %}" class="btn btn-success px-4">+ Nuovo ordine</a>
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-end gap-3 mb-4">
+            <div class="d-flex gap-2 align-items-end w-100 w-md-auto">
+                <div class="flex-grow-1">
+                    <label for="metodo_pagamento_select"
+                           class="form-label fw-bold text-muted small mb-1">
+                        <i class="bi bi-wallet2"></i> Metodo:
+                    </label>
+                    <select name="metodo_pagamento"
+                            id="metodo_pagamento_select"
+                            class="form-select"
+                            form="form-paga">
+                        <option value="Contanti" selected>Contanti</option>
+                        <option value="Paypal">Paypal</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-warning text-nowrap" form="form-paga">
+                    <i class="bi bi-cash-coin"></i> Paga
+                </button>
+            </div>
+            <div class="w-100 w-md-auto text-end">
+                <a href="{% url 'app:order_create' %}"
+                   class="btn btn-success px-4 w-100 w-md-auto">+ Nuovo ordine</a>
+            </div>
         </div>
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-dark">
-                    <tr>
-                        {% comment %} <th>ID</th> {% endcomment %}
-                        <th>Persona</th>
-                        <th>Data</th>
-                        <th>Stato</th>
-                        <th class="text-end">Totale</th>
-                        {% comment %} <th class="text-end">Azioni</th> {% endcomment %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                        <tr class="table-row-link"
-                            onclick="window.location.href='{% url 'app:order_detail' order.id %}'">
-                            {% comment %} <td><strong>#{{ order.id }}</strong></td> {% endcomment %}
-                            <td>{{ order.person }}</td>
-                            <td>{{ order.created_at|date:"d/m/y H:i" }}</td>
-                            <td>
-                                {% if order.payment_status == 'PAID' %}
-                                    <span class="badge bg-success">{{ order.get_payment_status_display }}</span>
-                                {% else %}
-                                    <span class="badge bg-warning">{{ order.get_payment_status_display }}</span>
-                                {% endif %}
-                            </td>
-                            <td class="text-end fw-bold">€{{ order.total }}</td>
-                            {% comment %} <td class="text-end">
-                        <div class="btn-group">
-                            <a href="{% url 'app:order_delete' order.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></a>
-                        </div>
-                            </td> {% endcomment %}
-                        </tr>
-                    {% empty %}
+        <form id="form-paga" method="POST" action="{% url 'app:order_pay_bulk' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.get_full_path }}">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-dark">
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-5">Nessun ordine trovato con questi criteri.</td>
+                            <th style="width: 40px;" class="text-center">
+                                <input type="checkbox" id="select-all" class="form-check-input">
+                            </th>
+                            <th>Persona</th>
+                            <th>Data</th>
+                            <th>Stato</th>
+                            <th class="text-end">Totale</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr class="table-row-link"
+                                onclick="window.location.href='{% url 'app:order_detail' order.id %}'">
+                                <td class="text-center" onclick="event.stopPropagation();">
+                                    {% if order.payment_status == 'UNPAID' %}
+                                        <input type="checkbox"
+                                               name="order_ids"
+                                               value="{{ order.id }}"
+                                               class="form-check-input order-checkbox">
+                                    {% else %}
+                                        <i class="bi bi-check-lg text-success opacity-50"></i>
+                                    {% endif %}
+                                </td>
+                                <td>{{ order.person }}</td>
+                                <td>{{ order.created_at|date:"d/m/y H:i" }}</td>
+                                <td>
+                                    {% if order.payment_status == 'PAID' %}
+                                        <span class="badge bg-success">{{ order.get_payment_status_display }}</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">{{ order.get_payment_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-end fw-bold">€{{ order.total }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-5">Nessun ordine trovato con questi criteri.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </form>
         <hr>
-        <!-- buttons to export in csv/excel the orders-->
         <div class="d-flex justify-content-end gap-2 mt-1">
             <a href="{% url 'app:export_orders_api' %}?{{ request.GET.urlencode }}"
                class="btn btn-outline-primary">
                 <i class="bi bi-file-earmark-spreadsheet"></i> Esporta EXCEL
             </a>
-            {% comment %} <a href="{% url 'app:export_orders_excel' %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary"> {% endcomment %}
-            {% comment %} </a> {% endcomment %}
         </div>
     </div>
 {% endblock %}
@@ -95,7 +122,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     // 2. Miglioramento estetico degli altri campi del form
-    // Django forms a volte non aggiungono 'form-control' automaticamente
     const inputs = document.querySelectorAll('.card-body form input, .card-body form select');
     inputs.forEach(el => {
         if (!el.classList.contains('tomselected')) {
@@ -105,6 +131,18 @@ document.addEventListener("DOMContentLoaded", function() {
             el.classList.add('form-select');
         }
     });
+
+    // 3. NUOVO SCRIPT: Gestione Checkbox "Seleziona Tutto"
+    const selectAllCheckbox = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.order-checkbox');
+
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+    }
 });
     </script>
 {% endblock %}

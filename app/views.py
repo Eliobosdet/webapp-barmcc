@@ -11,9 +11,11 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from django.views.generic import ListView, UpdateView
 from django.utils import timezone
-import os
+import os, json
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from django.conf import settings as django_settings # Per accedere a DEBUG
+
 
 
 # Import locali
@@ -80,6 +82,8 @@ def home(request):
     Home page intelligente:
     - Se loggato E partner → mostra dashboard partner
     """
+    if not request.user.is_authenticated:
+        return redirect("app:login")
 
     has_person = hasattr(request.user, "person_profile")
     is_partner = has_person and request.user.person_profile.is_partner
@@ -113,11 +117,14 @@ def order_list(request):
 
     form = OrderFilterForm(request.GET)
 
+
     if form.is_valid():
         if form.cleaned_data["person"]:
             orders = orders.filter(person=form.cleaned_data["person"])
+
         if form.cleaned_data["status"]:
             orders = orders.filter(payment_status=form.cleaned_data["status"])
+
         if form.cleaned_data["date"]:
             orders = orders.filter(created_at__date=form.cleaned_data["date"])
 
@@ -269,20 +276,59 @@ def order_delete(request, order_id):
 
 @partner_required
 @login_required
-def order_mark_paid(request, order_id):
+@require_POST
+def order_mark_paid(request, order_id=None):
     """
-    Segna un ordine come pagato
+    Gestisce sia il pagamento singolo (Toggle) che quello multiplo (Bulk Set).
     """
-    order = Order.objects.get(pk=order_id)
-    metodo = request.POST.get("metodo_pagamento", "Nessuno")
-    order.payment_method = metodo.capitalize()
-    if order.payment_status == "PAID":
-        order.payment_status = "UNPAID"
 
+    # 1. LOGICA MULTIPLA (BULK)
+    # Controlliamo se nel POST c'è una lista di ID (dai checkbox)
+    order_ids = request.POST.getlist('order_ids')
+    metodo = request.POST.get("metodo_pagamento", "Contanti") # Default Contanti se manca
+    next_url = request.POST.get('next') or request.GET.get('next')
+
+    if order_ids:
+        # Aggiornamento massivo: Impostiamo tutto a PAID
+        # Usiamo .update() che è molto efficiente (una sola query SQL)
+        updated_count = Order.objects.filter(id__in=order_ids, payment_status='UNPAID').update(
+            payment_status='PAID',
+            payment_method=metodo.capitalize()
+        )
+        
+        if updated_count > 0:
+            messages.success(request, f"Segnati come PAGATI {updated_count} ordini.")
+        else:
+            messages.warning(request, "Nessun ordine aggiornato (forse erano già pagati).")
+            
+        if next_url:
+            return redirect(next_url)
+        return redirect("app:order_list")        # Nel caso multiplo, torniamo sempre alla lista (preservando i filtri se possibile, ma qui semplifichiamo)
+
+    # 2. LOGICA SINGOLA (TOGGLE)
+    # Se non c'è una lista, deve esserci l'order_id passato dall'URL
+    elif order_id:
+        order = get_object_or_404(Order, pk=order_id)
+        
+        # Qui manteniamo la logica "Toggle" originale
+        order.payment_method = metodo.capitalize()
+        
+        if order.payment_status == "PAID":
+            order.payment_status = "UNPAID"
+            order.payment_method = "NESSUNO"
+        else:
+            order.payment_status = "PAID"
+        
+        order.save()
+        return redirect("app:order_detail", order_id=order_id)
+
+    # 3. FALLBACK (Niente ID e niente Lista)
     else:
-        order.payment_status = "PAID"
-    order.save()
-    return redirect("app:order_detail", order_id=order_id)
+        messages.error(request, "Nessun ordine specificato.")
+        if next_url:
+            return redirect(next_url)
+        return redirect("app:order_list")        # Nel caso multiplo, torniamo sempre alla lista (preservando i filtri se possibile, ma qui semplifichiamo)
+
 
 
 @login_required
@@ -569,37 +615,35 @@ def check_party_mode(request):
 def toggle_party_mode(request):
     settings, _ = GlobalSettings.objects.get_or_create(pk=1)
 
-    # Leggiamo cosa vuole fare l'utente (acceso o spento?)
-    import json
-
     data = json.loads(request.body)
     wants_active = data.get("active")
+    error_msg = None
 
     if wants_active:
-        # --- ATTIVAZIONE ---
-        # Si può sempre attivare (se era spento)
         if not settings.party_mode_active:
             settings.party_mode_active = True
-            settings.last_party_start = timezone.now()  # Salviamo l'orario di start
+            settings.last_party_start = timezone.now()
             settings.save()
     else:
         # --- DISATTIVAZIONE ---
-        # Si può disattivare SOLO se il tempo è scaduto
-        if settings.get_remaining_lock_time() <= 0:
+        remaining = settings.get_remaining_lock_time()
+        if remaining <= 0:
             settings.party_mode_active = False
             settings.save()
         else:
-            # Se l'utente prova a spegnere prima del tempo, il server IGNORA la richiesta
-            # e restituisce lo stato attuale (che è ancora Active)
-            pass
+            # Calcoliamo il tempo in base al DEBUG di Django
+            tempo = "60 secondi" if django_settings.DEBUG else "60 minuti"
+            error_msg = f"⚠️ Il college party deve durare almeno {tempo}! Non fare il guastafeste."
+            messages.error(request, error_msg)
 
-    # Restituiamo lo stato AGGIORNATO (che comanda sulla UI)
-    remaining = settings.get_remaining_lock_time()
+    # Restituiamo lo stato aggiornato
+    remaining_now = settings.get_remaining_lock_time()
     return JsonResponse(
         {
-            "status": "ok",
+            "status": "ok" if not error_msg else "error",
             "active": settings.party_mode_active,
-            "locked": remaining > 0,
-            "remaining_seconds": int(remaining),
+            "locked": remaining_now > 0,
+            "remaining_seconds": int(remaining_now),
+            "error_message": error_msg  # Passiamo il messaggio al JS
         }
     )

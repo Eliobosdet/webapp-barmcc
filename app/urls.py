@@ -19,6 +19,9 @@ urlpatterns = [
         views.order_mark_paid,
         name="order_mark_paid",
     ),
+    path("orders/pay-bulk/", 
+        views.order_mark_paid, 
+        name="order_pay_bulk"),
     path(
         "people/", partner_required(views.PersonListView.as_view()), name="person_list"
     ),

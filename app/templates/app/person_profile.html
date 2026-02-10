@@ -202,7 +202,9 @@
                                             <a href="{% url 'app:order_list' %}?person={{ person.id }}&status=UNPAID"
                                                class="stretched-link text-decoration-none"></a>
                                         {% endif %}
-                                        <div class="text-muted fs-6 mb-2">Ancora da saldare</div>
+                                        <div class="text-muted fs-6 mb-2">
+                                            Ancora da saldare <i class="bi-box-arrow-in-up-right mx-1"></i>
+                                        </div>
                                         {{ person.total_unpaid|floatformat:2 }} €
                                         {% if user.person_profile.is_partner %}</a>{% endif %}
                                 </div>
