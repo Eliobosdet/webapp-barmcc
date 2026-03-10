@@ -26,33 +26,62 @@
     }
 
     /* Il main ora deve essere trasparente per far vedere il body sotto */
-    main {
+    /* =========================================
+       FIX DEFINITIVO LAYOUT
+       ========================================= */
+    /* =========================================
+       FIX DEFINITIVO LAYOUT (AMMAZZA-BOOTSTRAP)
+       ========================================= */
+    
+    /* 1. Sblocchiamo l'altezza fissa del body che impedisce il corretto scroll */
+    html, body {
+        height: auto !important;
+        min-height: 100vh !important;
+    }
+
+    /* 2. Usiamo "main.d-flex" (tag + classe) per avere una priorità più 
+       alta e battere definitivamente il Flexbox di base.html */
+    main.d-flex {
+        display: block !important; 
         background: transparent !important;
-        min-height: 100vh; 
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
         
-        /* Spaziatura per non sovrapporsi alla navbar e dare aria in fondo */
-        padding-top: 120px; 
-        padding-bottom: 100px;
+        /* Abbondiamo col padding per sicurezza sotto la navbar */
+        padding-top: 140px !important; 
+        padding-bottom: 100px !important;
+    }
+
+    /* Visto che abbiamo tolto Flexbox, usiamo i margini per centrare gli elementi */
+    .sun-container {
+        position: relative;
+        width: 250px;
+        height: 250px;
+        
+        /* Questo centra il blocco orizzontalmente */
+        margin: 0 auto 3rem auto; 
+        
+        z-index: 1;
+        background-color: rgba(0,0,0,0.5); 
+        border-radius: 50%;
+    }
+
+    .poem-container {
+        position: relative;
+        z-index: 2;
+        max-width: 600px;
+        
+        /* Questo centra il testo orizzontalmente */
+        margin: 0 auto; 
+        
+        padding: 0 20px;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.95);
+        font-family: 'Cormorant Garamond', serif;
     }
 
     /* =========================================
        IL "SOLE POSTICCIO"
        ========================================= */
-    .sun-container {
-        position: relative;
-        width: 250px;
-        height: 250px;
-        margin-bottom: 3rem;
-        z-index: 1;
-        /* Debug: sfondo scuro se l'immagine non carica */
-        background-color: rgba(0,0,0,0.5); 
-        border-radius: 50%;
-    }
+    
 
     .rotating-circle {
         width: 100%;
@@ -80,15 +109,7 @@
     /* =========================================
        LA POESIA
        ========================================= */
-    .poem-container {
-        position: relative;
-        z-index: 2;
-        max-width: 600px;
-        padding: 0 20px;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.95);
-        font-family: 'Cormorant Garamond', serif;
-    }
+    
 
     .stanza {
         font-size: 1.4rem;

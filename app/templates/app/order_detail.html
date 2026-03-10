@@ -60,9 +60,11 @@
                 <h1 class="mb-3">Ordine numero #{{ order.id }}</h1>
                 <div class="card mb-4">
                     <div class="card-body">
-                        <p class="mb-2">
-                            <strong class="order-detail-label">Pagante:</strong> {{ order.person }}
-                        </p>
+                        <a href="{% url 'app:profile' order.person.id %}" class="text-decoration-none text-reset">
+                            <p class="mb-2">
+                                <strong class="order-detail-label">Pagante:</strong> {{ order.person }}
+                            </p>
+                        </a>
                         <p class="mb-2">
                             <strong class="order-detail-label">Data e Ora:</strong> {{ order.created_at }}
                         </p>
@@ -75,9 +77,11 @@
                         <p class="mb-2">
                             <strong class="order-detail-label">Totale:</strong> €{{ order.total }}
                         </p>
+                        <a href="{% url 'app:profile' order.created_by.id %}" class="text-decoration-none text-reset">
                         <p class="mb-0 text-muted">
                             (Inserito da:</strong> {{ order.created_by }})
                         </p>
+                        </a>
                     </div>
                 </div>
                 <h2 class="mb-3">Articoli dell'ordine:</h2>

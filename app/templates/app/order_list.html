@@ -78,7 +78,11 @@
                                         <i class="bi bi-check-lg text-success opacity-50"></i>
                                     {% endif %}
                                 </td>
-                                <td>{{ order.person }}</td>
+                                <td>
+                                    <a href="{% url 'app:profile' order.person.id %}" class="text-decoration-none text-reset">
+                                    {{ order.person }}
+                                </a>
+                                </td>
                                 <td>{{ order.created_at|date:"d/m/y H:i" }}</td>
                                 <td>
                                     {% if order.payment_status == 'PAID' %}
