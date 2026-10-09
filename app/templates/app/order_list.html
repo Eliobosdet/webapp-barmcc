@@ -3,27 +3,40 @@
 {% block title %}Lista Ordini - BARMCC{% endblock %}
 {% block content %}
     <div class="container mt-4">
-        <h1 class="mb-4">Lista ordini</h1>
-        <div class="card card-body mb-4 shadow-sm border-0 bg-light">
-            <form method="get" class="row g-3">
-                <div class="col-md-4">
-                    {{ filter_form.person.label_tag }}
-                    {{ filter_form.person }}
+        <h1 class="mb-4 fw-bold">Lista ordini</h1>
+        
+        <!-- INIZIO ZONA FILTRI A TENDINA -->
+        <div class="mb-4">
+            <button class="btn btn-outline-secondary w-100 d-flex justify-content-between align-items-center shadow-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="false" aria-controls="filterCollapse" style="background-color: #f8f9fa;">
+                <span class="fw-bold"><i class="bi bi-funnel"></i> Filtra Ordini</span>
+                <i class="bi bi-chevron-down toggle-icon"></i>
+            </button>
+            
+            <div class="collapse mt-2 {% if request.GET %}show{% endif %}" id="filterCollapse">
+                <div class="card card-body shadow-sm border-0 bg-light">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-4">
+                            {{ filter_form.person.label_tag }}
+                            {{ filter_form.person }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ filter_form.status.label_tag }}
+                            {{ filter_form.status }}
+                        </div>
+                        <div class="col-md-3">
+                            {{ filter_form.date.label_tag }}
+                            {{ filter_form.date }}
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary w-100">Filtra</button>
+                            <a href="{% url 'app:order_list' %}" class="btn btn-outline-secondary">Reset</a>
+                        </div>
+                    </form>
                 </div>
-                <div class="col-md-3">
-                    {{ filter_form.status.label_tag }}
-                    {{ filter_form.status }}
-                </div>
-                <div class="col-md-3">
-                    {{ filter_form.date.label_tag }}
-                    {{ filter_form.date }}
-                </div>
-                <div class="col-md-2 d-flex align-items-end gap-2">
-                    <button type="submit" class="btn btn-primary w-100">Filtra</button>
-                    <a href="{% url 'app:order_list' %}" class="btn btn-outline-secondary">Reset</a>
-                </div>
-            </form>
+            </div>
         </div>
+        <!-- FINE ZONA FILTRI A TENDINA -->
+
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-end gap-3 mb-4">
             <div class="d-flex gap-2 align-items-end w-100 w-md-auto">
                 <div class="flex-grow-1">
@@ -43,11 +56,8 @@
                     <i class="bi bi-cash-coin"></i> Paga
                 </button>
             </div>
-            <div class="w-100 w-md-auto text-end">
-                <a href="{% url 'app:order_create' %}"
-                   class="btn btn-success px-4 w-100 w-md-auto">+ Nuovo ordine</a>
-            </div>
         </div>
+        
         <form id="form-paga" method="POST" action="{% url 'app:order_pay_bulk' %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -60,13 +70,13 @@
                             </th>
                             <th>Persona</th>
                             <th>Data</th>
-                            <th>Stato</th>
                             <th class="text-end">Totale</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for order in orders %}
-                            <tr class="table-row-link"
+                            <!-- Applichiamo il colore di background in base allo stato -->
+                            <tr class="table-row-link {% if order.payment_status == 'PAID' %}table-success{% else %}table-danger{% endif %}"
                                 onclick="window.location.href='{% url 'app:order_detail' order.id %}'">
                                 <td class="text-center" onclick="event.stopPropagation();">
                                     {% if order.payment_status == 'UNPAID' %}
@@ -75,7 +85,8 @@
                                                value="{{ order.id }}"
                                                class="form-check-input order-checkbox">
                                     {% else %}
-                                        <i class="bi bi-check-lg text-success opacity-50"></i>
+                                        <!-- Checkmark leggermente più scuro per contrastare il verde -->
+                                        <i class="bi bi-check-lg text-success fw-bold"></i>
                                     {% endif %}
                                 </td>
                                 <td>
@@ -84,18 +95,12 @@
                                 </a>
                                 </td>
                                 <td>{{ order.created_at|date:"d/m/y H:i" }}</td>
-                                <td>
-                                    {% if order.payment_status == 'PAID' %}
-                                        <span class="badge bg-success">{{ order.get_payment_status_display }}</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">{{ order.get_payment_status_display }}</span>
-                                    {% endif %}
-                                </td>
                                 <td class="text-end fw-bold">€{{ order.total }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="6" class="text-center text-muted py-5">Nessun ordine trovato con questi criteri.</td>
+                                <!-- Aggiornato il colspan a 4 -->
+                                <td colspan="4" class="text-center text-muted py-5">Nessun ordine trovato con questi criteri.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -136,7 +141,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // 3. NUOVO SCRIPT: Gestione Checkbox "Seleziona Tutto"
+    // 3. Gestione Checkbox "Seleziona Tutto"
     const selectAllCheckbox = document.getElementById('select-all');
     const checkboxes = document.querySelectorAll('.order-checkbox');
 
@@ -145,6 +150,23 @@ document.addEventListener("DOMContentLoaded", function() {
             checkboxes.forEach(cb => {
                 cb.checked = this.checked;
             });
+        });
+    }
+    
+    // 4. Gestione icona freccia della tendina filtri
+    const filterCollapse = document.getElementById('filterCollapse');
+    const toggleIcon = document.querySelector('.toggle-icon');
+    
+    if(filterCollapse && toggleIcon) {
+        if(filterCollapse.classList.contains('show')) {
+            toggleIcon.classList.replace('bi-chevron-down', 'bi-chevron-up');
+        }
+        
+        filterCollapse.addEventListener('show.bs.collapse', function () {
+            toggleIcon.classList.replace('bi-chevron-down', 'bi-chevron-up');
+        });
+        filterCollapse.addEventListener('hide.bs.collapse', function () {
+            toggleIcon.classList.replace('bi-chevron-up', 'bi-chevron-down');
         });
     }
 });

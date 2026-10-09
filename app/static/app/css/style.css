@@ -16,7 +16,7 @@
     --accent-color: #ffc107;
     --accent-contrast: #160c44;
 
-    --border-color: rgba(0,0,0,0.125);
+    --border-color: rgba(0, 0, 0, 0.125);
 
     --logo-color: #ffc107;
 
@@ -25,6 +25,15 @@
 
     --toggle-btn-bg: rgba(255, 255, 255, 0.1);
     --toggle-btn-border: rgba(255, 255, 255, 0.3);
+
+    /* Link navbar */
+    --nav-link-color: rgba(157, 213, 255, 0.75);
+    --nav-link-icon: rgb(118, 141, 158);
+    --nav-link-hover-bg: rgba(255, 255, 255, 0.08);
+    --nav-link-hover-color: #ffffff;
+    --nav-link-active-bg: rgba(255, 193, 7, 0.14);
+    --nav-link-active-color: #ffc107;
+    --nav-section-color: #8c959d;
 
     /* Bootstrap overrides */
     --bs-body-bg: var(--body-bg);
@@ -37,38 +46,46 @@
 }
 
 /* =========================================================
-PARTY MODE – NEON 80s
-========================================================= */
+   PARTY MODE – NEON 80s
+   ========================================================= */
 [data-theme="party"] {
     --nav-bg: #ff00ff;
     --nav-element-bg: #df03df;
     --footer-bg: #ff00ff;
-    
+
     --body-bg: #0b012a;
     --surface-bg: #160a3a;
-    
+
     --text-main: #00ffcc;
     --text-muted: #6fffe9;
     --text-invert: #ffffff;
-    
+
     --accent-color: #ff00ff;
     --accent-contrast: #0b012a;
-    
+
     --border-color: #ff00ff;
-    
+
     --logo-color: #ffbe46;
-    
+
     --card-bg: #160a3a;
     --card-text: #ffffff;
-    
-    --toggle-btn-bg: rgba(0,0,0,0.3);
+
+    --toggle-btn-bg: rgba(0, 0, 0, 0.3);
     --toggle-btn-border: #ffffff;
-    
+
+    /* Link navbar */
+    --nav-link-color: #0b012a;
+    --nav-link-icon: #3a0a5c;
+    --nav-link-hover-bg: rgba(11, 1, 42, 0.18);
+    --nav-link-hover-color: #ffffff;
+    --nav-link-active-bg: #0b012a;
+    --nav-link-active-color: #ffee07;
+    --nav-section-color: #0b012a;
+
+    /* Bootstrap overrides */
     --bs-body-bg: #0b012a;
     --bs-body-color: #00ffcc;
     --bs-warning: #FFF700;
-    
-    /* Bootstrap overrides */
     --bs-success: #35cb7d;
     --bs-danger: #FF1744;
     --bs-secondary: #6fffe9;
@@ -78,110 +95,66 @@ PARTY MODE – NEON 80s
 /* =========================================================
    STRUTTURA BASE
    ========================================================= */
-html, body { height: 100%; }
+html {
+    height: 100%;
+}
 
 body {
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
     background-color: var(--body-bg);
     color: var(--text-main);
     transition: background-color 0.4s ease, color 0.4s ease;
 }
 
-main { flex: 1; }
+main {
+    flex: 1;
+}
 
 /* =========================================================
-   NAVBAR
+   NAVBAR – STRUTTURA
    ========================================================= */
 .navbase {
     background-color: var(--nav-bg) !important;
-}
-
-.nav-link {
-    color: #adb5bd !important;
-}
-
-i {
-    /* vertical-align: middle; */
-    /* position: relative; */
-    top: -2px;
+    transition: background-color 0.4s ease;
 }
 
 .bg-nav-element {
     background-color: var(--nav-element-bg) !important;
 }
 
-[data-theme="party"] .nav-link {
-    color: #0b012a !important;
-    text-shadow: 0 0 5px var(--accent-color);
+/* Animazione di apertura/chiusura più veloce e senza scatti */
+.navbar-collapse.collapsing {
+    transition: height 0.25s ease;
 }
 
-[data-theme="party"] select {
-    background-color: #ffffff;
-    color: var(--text-main);
-    border: 1px solid var(--border-color);
+/* Il padding sta nel contenitore interno, non sul .collapse,
+   così l'altezza animata non "salta" a fine transizione */
+.nav-collapse-inner {
+    padding: 0.75rem 0 0.5rem;
 }
 
-/* =========================================================
-   LOGO PROFESSIONAL STYLING
-   ========================================================= */
-
-/* Stile Base (Light Mode) */
-.logo {
-    font-family: 'Outfit', sans-serif; /* Font moderno */
-    font-weight: 800;                  /* Molto grassetto (Black) */
-    font-size: 1.7rem;                 /* Dimensione autorevole */
-    letter-spacing: -0.03em;           /* Lettere leggermente più vicine (look compatto) */
-    text-transform: uppercase;
-    color: var(--nav-bg);              /* Usa il colore della navbar o scuro */
-    
-    /* Gradiente sottile per effetto "Premium" (opzionale) */
-    background: linear-gradient(135deg, #bdbf46 0%, #77afee 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    
-    /* Rimuove decorazioni link */
-    /* text-decoration: none;
-    display: inline-flex;
-    align-items: center; */
-    transition: all 0.3s ease;
+@media (min-width: 992px) {
+    .nav-collapse-inner {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0;
+        margin-left: 1.5rem;
+    }
 }
 
-/* Hover in Light Mode */
-.logo:hover {
-    transform: translateY(-1px);
-    filter: brightness(1.2);
+/* Hamburger */
+.navbar-toggler {
+    border: 0;
+    padding: 0.25rem;
 }
 
-/* =========================================================
-   LOGO - PARTY MODE (NEON 80s)
-   ========================================================= */
-   
-[data-theme="party"] .logo {
-    /* Reset del gradiente della light mode */
-    background: none;
-    -webkit-text-fill-color: unset;
-    
-    /* Colore base */
-    color: #ffffff; 
-    
-    /* Effetto NEON Principale */
-    text-shadow: 
-        0 0 5px  #fff,              /* Nucleo bianco */
-        0 0 10px #000000,              /* Alone interno */
-        0 0 20px var(--accent-color), /* Colore primario (Fucsia/Giallo) */
-        0 0 40px var(--accent-color), /* Alone largo */
-        0 0 80px var(--accent-color); /* Diffusione massima */
-        
-    letter-spacing: 0.25em; /* Più spaziato per effetto insegna */
-}
-
-/* Icona in Party Mode */
-[data-theme="party"] .logo i {
-    -webkit-text-fill-color: #00ffcc; /* Turchese elettrico */
-    text-shadow: 0 0 10px #00ffcc;
-    filter: none;
-    animation: flicker 3s infinite alternate; /* Sfarfallio opzionale */
+.navbar-toggler:focus {
+    box-shadow: none;
+    outline: 2px solid var(--accent-color);
 }
 
 .navbar-toggler-icon {
@@ -189,28 +162,116 @@ i {
 }
 
 [data-theme="party"] .navbar-toggler {
-    border: 1px solid var(--accent-color) !important;
+    border: 1px solid var(--accent-color);
     box-shadow: 0 0 10px var(--accent-color);
 }
 
 /* =========================================================
-   NAVBAR IMPROVEMENTS
+   NAVBAR – LINK
    ========================================================= */
-
-/* Fissa l'altezza della navbar per evitare salti */
-/* .navbar {
-    min-height: 70px;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-} */
-
-/* Migliora l'aspetto del toggle su mobile */
-.navbar-toggler:focus {
-    box-shadow: none; 
-    outline: 2px solid var(--accent-color);
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    width: 100%;
 }
 
-/* Stile Dropdown più pulito */
+@media (min-width: 992px) {
+    .nav-links {
+        flex-direction: row;
+        align-items: center;
+        gap: 2px;
+        width: auto;
+    }
+}
+
+.custom-nav-link {
+    display: flex;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--nav-link-color);
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.custom-nav-link .nav-icon {
+    width: 24px;
+    margin-right: 10px;
+    font-size: 1.1rem;
+    line-height: 1;
+    text-align: center;
+    color: var(--nav-link-icon);
+    transition: color 0.15s ease;
+}
+
+.custom-nav-link:hover,
+.custom-nav-link:focus-visible {
+    background-color: var(--nav-link-hover-bg);
+    color: var(--nav-link-hover-color);
+}
+
+.custom-nav-link:hover .nav-icon,
+.custom-nav-link:focus-visible .nav-icon {
+    color: var(--nav-link-hover-color);
+}
+
+.custom-nav-link.active {
+    background-color: var(--nav-link-active-bg);
+    color: var(--nav-link-active-color);
+}
+
+.custom-nav-link.active .nav-icon {
+    color: var(--nav-link-active-color);
+}
+
+/* Titolo sezione (solo mobile) */
+.nav-section-title {
+    padding: 12px 14px 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--nav-section-color);
+}
+
+/* Separatore verticale (solo desktop) */
+.nav-divider {
+    width: 1px;
+    height: 24px;
+    margin: 0 10px;
+    background-color: currentColor;
+    color: var(--nav-section-color);
+    opacity: 0.35;
+}
+
+/* Sezione utente mobile */
+[data-theme="party"] .border-top {
+    border-color: rgba(255, 0, 255, 0.3) !important;
+}
+
+/* =========================================================
+   NAVBAR – PILLOLA UTENTE + DROPDOWN
+   ========================================================= */
+.user-pill {
+    color: var(--nav-link-color);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.user-pill:hover,
+.user-pill:focus,
+.user-pill.show {
+    background-color: var(--nav-link-hover-bg);
+    color: var(--nav-link-hover-color);
+}
+
+[data-theme="party"] .user-pill {
+    text-shadow: 0 0 5px var(--accent-color);
+}
+
 .dropdown-menu {
     border-radius: 12px;
     padding: 0.5rem;
@@ -219,17 +280,12 @@ i {
 .dropdown-item {
     border-radius: 8px;
     font-size: 0.95rem;
-    transition: background-color 0.9s;
+    transition: background-color 0.2s;
 }
 
 .dropdown-item:active {
     background-color: var(--accent-color);
     color: var(--accent-contrast);
-}
-
-/* Party Mode adjustments per la nuova navbar */
-[data-theme="party"] .navbar-toggler {
-    color: #ffffff;
 }
 
 [data-theme="party"] .dropdown-menu {
@@ -246,15 +302,88 @@ i {
     color: #00ffcc;
 }
 
-/* Separatore utente mobile */
-[data-theme="party"] .border-top {
-    border-color: rgba(255, 0, 255, 0.3) !important;
+[data-theme="party"] select {
+    background-color: #ffffff;
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
 }
 
+/* =========================================================
+   LOGO
+   ========================================================= */
+.logo {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.7rem;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+    color: var(--nav-bg);
+
+    background: linear-gradient(135deg, #bdbf46 0%, #77afee 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.logo:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.2);
+}
+
+[data-theme="party"] .logo {
+    background: none;
+    -webkit-text-fill-color: unset;
+    color: #ffffff;
+    letter-spacing: 0.25em;
+    text-shadow:
+        0 0 5px #fff,
+        0 0 10px #000000,
+        0 0 20px var(--accent-color),
+        0 0 40px var(--accent-color),
+        0 0 80px var(--accent-color);
+}
+
+[data-theme="party"] .logo i {
+    -webkit-text-fill-color: #00ffcc;
+    text-shadow: 0 0 10px #00ffcc;
+    filter: none;
+    animation: flicker 3s infinite alternate;
+}
+
+/* =========================================================
+   BOTTONI
+   ========================================================= */
 [class*="btn-success"] {
-    background-color: var(--bs-success);    
+    background-color: var(--bs-success);
     border-color: var(--bs-success);
     color: var(--text-invert);
+}
+
+.btn-danger {
+    background-color: var(--bs-danger);
+    border-color: var(--bs-danger);
+    color: var(--text-invert);
+}
+
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--text-invert);
+}
+
+.btn-warning {
+    background-color: var(--accent-color) !important;
+    border-color: var(--accent-color) !important;
+    color: var(--accent-contrast) !important;
+}
+
+[data-theme="party"] .btn-warning {
+    background-color: #ffee07 !important;
+    border-color: #ffee07 !important;
+    color: #160c44 !important;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
 }
 
 .bg-success {
@@ -263,18 +392,6 @@ i {
 
 .text-success {
     color: var(--bs-success) !important;
-}
-
-.btn-danger {
-    background-color: var(--bs-danger);    
-    border-color: var(--bs-danger);
-    color: var(--text-invert);
-}
-
-.btn-primary {
-    background-color: var(--bs-primary);    
-    border-color: var(--bs-primary);
-    color: var(--text-invert);
 }
 
 /* =========================================================
@@ -292,22 +409,20 @@ i {
     color: var(--card-text) !important;
 }
 
+.card-text .badge {
+    background-color: transparent !important;
+    color: var(--card-text) !important;
+    border-color: var(--border-color) !important;
+}
+
 [data-theme="party"] .card-header {
-    background-color:#a200ff !important;
+    background-color: #a200ff !important;
 }
 
 [data-theme="party"] .card {
     border: 2px solid var(--accent-color) !important;
     box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
 }
-
-/* Forza il badge del prezzo a usare i colori del tema attuale */
-.card-text .badge {
-    background-color: transparent !important;
-    color: var(--card-text) !important; /* In Light Mode sarà #212529 (nero/antracite) */
-    border-color: var(--border-color) !important;
-}
-
 
 /* =========================================================
    TESTI & TITOLI
@@ -318,7 +433,7 @@ i {
 
 .text-invert {
     color: var(--text-invert) !important;
-}   
+}
 
 [data-theme="party"] h1,
 [data-theme="party"] h2,
@@ -333,32 +448,15 @@ i {
 }
 
 /* =========================================================
-   BUTTONS
-   ========================================================= */
-.btn-warning {
-    background-color: var(--accent-color) !important;
-    border-color: var(--accent-color) !important;
-    color: var(--accent-contrast) !important;
-}
-
-[data-theme="party"] .btn-warning {
-    background-color: #ffee07 !important;
-    border-color: #ffee07 !important;
-    color: #160c44 !important;
-    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-}
-
-/* =========================================================
    TABLE
    ========================================================= */
-
 [data-theme="party"] .table-dark {
     --bs-table-bg: #a200ff;
     --bs-table-color: #ffffff;
 }
 
 [data-theme="party"] tbody {
-    --bs-table-color:#ffffff
+    --bs-table-color: #ffffff;
 }
 
 /* =========================================================
@@ -381,22 +479,33 @@ i {
     color: #adb5bd;
 }
 
+.footer-tagline {
+    color: #adb5bd;
+}
+
 [data-theme="party"] .footer-bar {
     color: #ffee07 !important;
     text-shadow: 0 0 5px var(--accent-color);
     box-shadow: 0 -2px 10px rgba(255, 0, 255, 0.4);
 }
 
+[data-theme="party"] .footer-tagline {
+    color: #0b012a;
+    text-shadow: 0 0 5px var(--accent-color);
+}
+
 /* =========================================================
    TOGGLE PARTY
    ========================================================= */
 .cp-toggle-btn {
+    position: relative;
+    display: block;
     width: 60px;
     height: 36px;
+    margin: 0;
     background: var(--toggle-btn-bg);
     border: 1px solid var(--toggle-btn-border);
     border-radius: 20px;
-    position: relative;
     cursor: pointer;
     transition: all 0.6s ease;
 }
@@ -417,7 +526,6 @@ i {
 .cp-toggle-input {
     display: none !important;
 }
-
 
 .cp-toggle-input:checked + .cp-toggle-btn .cp-icon {
     left: 25px;
@@ -466,90 +574,75 @@ i {
     text-shadow: 0 0 10px var(--accent-color);
 }
 
-[data-theme="party"]  .order-detail-label {
-    color: var(--text-muted)
+[data-theme="party"] .order-detail-label {
+    color: var(--text-muted);
 }
 
 /* =========================================================
-   FIX TOMSELECT - PARTY MODE
+   TOMSELECT – PARTY MODE
    ========================================================= */
-
-/* 1. La casella principale (input) quando è chiusa o aperta */
 [data-theme="party"] .ts-control {
-    background-color: var(--surface-bg) !important; /* Sfondo Blu Scuro */
-    border: 1px solid var(--accent-color) !important; /* Bordo Neon */
-    color: #ffffff !important; /* Testo BIANCO */
+    background-color: var(--surface-bg) !important;
+    border: 1px solid var(--accent-color) !important;
+    color: #ffffff !important;
 }
 
-/* 2. Il testo dell'elemento selezionato (quello che non riuscivi a leggere) */
-[data-theme="party"] .ts-control > .item {
-    color: #ffffff !important; 
-}
-
-/* 3. Il testo che digiti per cercare */
+[data-theme="party"] .ts-control > .item,
 [data-theme="party"] .ts-control input {
-    color: #ffffff !important; 
+    color: #ffffff !important;
 }
 
-/* 4. Il menu a tendina che si apre */
 [data-theme="party"] .ts-dropdown {
     background-color: var(--surface-bg) !important;
     border: 1px solid var(--accent-color) !important;
     color: #ffffff !important;
 }
 
-/* 5. Le opzioni dentro il menu */
 [data-theme="party"] .ts-dropdown .option {
-    color: #ffffff !important; /* Testo bianco */
+    color: #ffffff !important;
 }
 
-/* 6. L'opzione evidenziata (hover) o attiva nel menu */
 [data-theme="party"] .ts-dropdown .option.active,
 [data-theme="party"] .ts-dropdown .option.selected {
-    background-color: var(--accent-color) !important; /* Sfondo Rosa/Giallo neon */
-    color: var(--accent-contrast) !important; /* Testo scuro per contrasto */
+    background-color: var(--accent-color) !important;
+    color: var(--accent-contrast) !important;
 }
 
-/* 7. Icona di rimozione (la "x") se presente */
 [data-theme="party"] .ts-wrapper.plugin-remove_button .item .remove {
-    border-left-color: rgba(255,255,255,0.3) !important;
+    border-left-color: rgba(255, 255, 255, 0.3) !important;
     color: #ffffff !important;
 }
 
 /* =========================================================
-   FIX FORM INPUTS & TEXTAREA - PARTY MODE
+   FORM INPUTS & TEXTAREA – PARTY MODE
    ========================================================= */
-
-/* 1. Stile base per Textarea e Input in Party Mode */
 [data-theme="party"] .form-control {
-    background-color: var(--surface-bg) !important; /* Sfondo Blu Scuro */
-    color: #ffffff !important;                      /* Testo BIANCO */
-    border: 1px solid var(--border-color);          /* Usa il bordo del tema (fucsia/bianco) */
+    background-color: var(--surface-bg) !important;
+    color: #ffffff !important;
+    border: 1px solid var(--border-color);
 }
 
-/* 2. Colore del testo "Placeholder" (il suggerimento "Es: shots offerti") */
-/* Lo facciamo grigio chiaro/bianco trasparente per distinguerlo dal testo vero */
 [data-theme="party"] .form-control::placeholder {
     color: rgba(255, 255, 255, 0.5) !important;
-    opacity: 1; /* Fix per Firefox */
+    opacity: 1; /* Fix Firefox */
 }
 
-/* 3. Stile quando clicchi dentro per scrivere (Focus) */
-/* Bootstrap tende a rimettere lo sfondo bianco al focus, dobbiamo impedirlo */
 [data-theme="party"] .form-control:focus {
-    background-color: var(--surface-bg) !important; 
+    background-color: var(--surface-bg) !important;
     color: #ffffff !important;
-    border-color: var(--accent-color) !important;   /* Bordo Neon */
-    box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);    /* Leggero alone luminoso */
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.3);
 }
 
-/* 4. Fix specifico per le input disabilitate (se ne hai) */
-[data-theme="party"] .form-control:disabled, 
+[data-theme="party"] .form-control:disabled,
 [data-theme="party"] .form-control[readonly] {
     background-color: rgba(0, 0, 0, 0.3) !important;
     color: var(--text-muted) !important;
 }
 
+/* =========================================================
+   ELEMENTI CADENTI (PARTY)
+   ========================================================= */
 .falling-item {
     position: fixed;
     top: -50px;
@@ -558,26 +651,3 @@ i {
     animation: fall linear forwards;
     font-size: 2rem;
 }
-
-/* =========================================================
-   MOBILE FIX
-   ========================================================= */
-@media (max-width: 991px) {
-    .container-fluid {
-        display: flex;
-        flex-wrap: nowrap;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .cp-wrapper {
-        order: 2;
-        margin-left: auto;
-        margin-right: 10px;
-    }
-
-    .navbar-toggler {
-        order: 3;
-    }
-}
-

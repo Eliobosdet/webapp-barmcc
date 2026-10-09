@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth import login, logout
@@ -46,25 +47,44 @@ def products_menu(request):
     )
 
 
+# class PersonListView(ListView):
+#     """
+#     Mostra la lista delle persone (solo per staff/partner)
+#     """
+
+#     model = Person
+#     template_name = "app/person_list.html"
+#     context_object_name = "people"
+#     paginate_by = 20  # opzionale
+
+#     def dispatch(self, request, *args, **kwargs):
+#         # Solo utenti loggati e partner possono accedere
+#         if not request.user.is_authenticated or not (
+#             hasattr(request.user, "person_profile")
+#             and request.user.person_profile.is_partner
+#         ):
+#             return redirect("app:home")
+#         return super().dispatch(request, *args, **kwargs)
+
 class PersonListView(ListView):
-    """
-    Mostra la lista delle persone (solo per staff/partner)
-    """
+    model = Person               # <-- AGGIUNGI QUESTA RIGA FONDAMENTALE
+    template_name = 'app/person_list.html'
+    context_object_name = 'people'
 
-    model = Person
-    template_name = "app/person_list.html"
-    context_object_name = "people"
-    paginate_by = 20  # opzionale
-
-    def dispatch(self, request, *args, **kwargs):
-        # Solo utenti loggati e partner possono accedere
-        if not request.user.is_authenticated or not (
-            hasattr(request.user, "person_profile")
-            and request.user.person_profile.is_partner
-        ):
-            return redirect("app:home")
-        return super().dispatch(request, *args, **kwargs)
-
+    def get_queryset(self):
+        # Recuperiamo la lista di base
+        queryset = super().get_queryset()
+        
+        # Leggiamo il termine di ricerca dall'URL (?q=...)
+        query = self.request.GET.get('q')
+        
+        # Se c'è una query, applichiamo il filtro su nome e cognome
+        if query:
+            queryset = queryset.filter(
+                Q(first_name__icontains=query) | Q(last_name__icontains=query)
+            )
+            
+        return queryset
 
 class PersonUpdateView(UpdateView):
     model = Person

@@ -82,6 +82,28 @@
                 </button>
             {% endif %}
         </div>
+
+        <!-- INIZIO BARRA DI RICERCA -->
+        <div class="row mb-4 px-1">
+            <div class="col-12 col-md-8 col-lg-6">
+                <form method="GET" action="">
+                    <div class="input-group shadow-sm">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="bi bi-search text-muted"></i>
+                        </span>
+                        <input type="text" name="q" class="form-control border-start-0 ps-2" placeholder="Cerca per nome o cognome..." value="{{ request.GET.q }}">
+                        <button class="btn btn-primary" type="submit">Cerca</button>
+                        {% if request.GET.q %}
+                            <a href="?" class="btn btn-outline-danger" title="Annulla ricerca">
+                                <i class="bi bi-x-lg"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- FINE BARRA DI RICERCA -->
+
         <div class="row g-4">
             <div class="col-12 col-lg-6">
                 <div class="card h-100 shadow-sm">
@@ -191,12 +213,14 @@
                 </div>
             </div>
         </div>
+        
+        <!-- PAGINAZIONE AGGIORNATA PER MANTENERE LA RICERCA -->
         {% if is_paginated %}
             <nav class="mt-4 mb-5">
                 <ul class="pagination justify-content-center pagination-sm">
                     {% if page_obj.has_previous %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Indietro</a>
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Indietro</a>
                         </li>
                     {% endif %}
                     <li class="page-item active">
@@ -204,12 +228,13 @@
                     </li>
                     {% if page_obj.has_next %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Avanti</a>
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}">Avanti</a>
                         </li>
                     {% endif %}
                 </ul>
             </nav>
         {% endif %}
+        
         {% if user.is_authenticated %}
             <button class="btn btn-success rounded-circle d-lg-none fab-btn"
                     data-bs-toggle="modal"
