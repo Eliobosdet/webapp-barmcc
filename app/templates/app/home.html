@@ -2,6 +2,23 @@
 {% block title %}Dashboard - BARMCC{% endblock %}
 {% block content %}
     <div class="container mt-4">
+
+        <!-- Banner secondo anniversario -->
+        <div class="anniv-banner" id="anniversaryBanner" hidden>
+            <button type="button"
+                    class="btn-close btn-close-white"
+                    id="anniversaryClose"
+                    aria-label="Chiudi"></button>
+            <div class="anniv-number" id="anniversaryNumber" title="Clicca!">2</div>
+            <div class="anniv-title">Anni di BAR MCC</div>
+            <p class="anniv-text mb-0">
+                Grazie a tutti voi, soci, habitué e perditempo, che in questi due anni
+                avete riempito il nostro piccolo tempio di bicchieri, risate e qualche
+                disastro memorabile. Il bar esiste grazie a voi.
+            </p>
+            <p class="anniv-toast mb-0"><i class="fa-solid fa-whiskey-glass"></i> Al prossimo giro!</p>
+        </div>
+
         {% if is_partner %}
             <div class="row">
                 <div class="col-12">
@@ -17,7 +34,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6 ">
+                        <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
                                     <a href="{% url 'app:order_list' %}?status=UNPAID"
@@ -37,7 +54,9 @@
                 </div>
             </div>
         {% endif %}
+
         <hr>
+
         <div class="row mt-4">
             <div class="col-12 text-center mb-4">
                 <h1 class="display-5 fw-bold"><i class="bi bi-trophy text-warning"></i> HUFF OF FAME <i class="bi bi-trophy text-warning"></i></h1>
@@ -47,7 +66,7 @@
                 {% for category, person in results.items %}
                     {% if request.user.is_authenticated %}
                         <a href="{% url 'app:profile' person.id %}" class="text-decoration-none">
-                        {% endif %}
+                    {% endif %}
                         <div class="card mb-4 shadow-sm border-0 overflow-hidden"
                              style="border-radius: 20px">
                             <div class="row g-0 align-items-center p-3">
@@ -55,15 +74,10 @@
                                     {% if person.profile_picture %}
                                         <img src="{{ person.profile_picture.url }}"
                                              class="img-fluid rounded-circle shadow-sm"
-                                             style="width: 100px;
-                                                    height: 100px;
-                                                    object-fit: cover;
-                                                    border: 3px solid #ffc107">
+                                             style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #ffc107">
                                     {% else %}
                                         <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm"
-                                             style="width: 100px;
-                                                    height: 100px;
-                                                    border: 3px solid #dee2e6">
+                                             style="width: 100px; height: 100px; border: 3px solid #dee2e6">
                                             <span class="h2 mb-0 text-secondary">{{ person.first_name|slice:":1" }}{{ person.last_name|slice:":1" }}</span>
                                         </div>
                                     {% endif %}
@@ -87,7 +101,7 @@
                                 </div>
                             </div>
                         </div>
-                        {% if request.user.is_authenticated %}</a>{% endif %}
+                    {% if request.user.is_authenticated %}</a>{% endif %}
                 {% empty %}
                     <div class="col-12 text-center">
                         <p class="alert alert-light">Nessun campione registrato al momento.</p>
@@ -97,4 +111,52 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const banner = document.getElementById('anniversaryBanner');
+        if (!banner) return;
+
+        const KEY = 'barmcc-anniv-2-closed';
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function confettiBurst() {
+            if (reduceMotion) return;
+            const colors = ['#ffc107', '#ff00ff', '#00ffcc', '#77afee', '#ffffff', '#ff5c5c'];
+
+            for (let i = 0; i < 45; i++) {
+                const el = document.createElement('div');
+                const duration = Math.random() * 2 + 2.5;
+
+                el.className = 'confetti-piece';
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                el.style.setProperty('--drift', (Math.random() * 160 - 80) + 'px');
+                el.style.animationDuration = duration + 's';
+                el.style.animationDelay = Math.random() * 0.8 + 's';
+
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), (duration + 1) * 1000);
+            }
+        }
+
+        let closed = false;
+        try { closed = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+
+        if (!closed) {
+            banner.hidden = false;
+            // Aspetta la fine del preloader prima di far partire i coriandoli
+            setTimeout(confettiBurst, 700);
+        }
+
+        document.getElementById('anniversaryNumber').addEventListener('click', confettiBurst);
+
+        document.getElementById('anniversaryClose').addEventListener('click', function () {
+            banner.hidden = true;
+            try { sessionStorage.setItem(KEY, '1'); } catch (e) {}
+        });
+    });
+</script>
 {% endblock %}

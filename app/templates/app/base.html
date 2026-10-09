@@ -321,24 +321,36 @@
                 let isPartyLocked = false; // aggiornato dal polling
 
                 // --- Animazione banane ---
-                function spawnBananas() {
-                    const emojis = ['🍌', '🍸', '✨', '🕺', '🎵'];
+                // --- Animazione elementi cadenti ---
+function spawnBananas() {
+    const items = [
+        { icon: 'fa-lemon',               color: '#ffee07' },
+        { icon: 'fa-martini-glass-citrus', color: '#00ffcc' },
+        { icon: 'fa-champagne-glasses',    color: '#ff00ff' },
+        { icon: 'fa-star',                 color: '#ffc107' },
+        { icon: 'fa-music',                color: '#77afee' },
+        { icon: 'fa-record-vinyl',         color: '#ffffff' }
+    ];
 
-                    for (let i = 0; i < 30; i++) {
-                        const el = document.createElement('div');
-                        el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
-                        el.classList.add('falling-item');
-                        el.style.left = Math.random() * 100 + 'vw';
+    for (let i = 0; i < 30; i++) {
+        const item = items[Math.floor(Math.random() * items.length)];
+        const el = document.createElement('div');
 
-                        const duration = Math.random() * 3 + 2;
-                        el.style.animationDuration = duration + 's';
-                        el.style.animationDelay = Math.random() * 2 + 's';
-                        el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+        el.innerHTML = '<i class="fa-solid ' + item.icon + '"></i>';
+        el.classList.add('falling-item');
+        el.style.color = item.color;
+        el.style.textShadow = '0 0 10px ' + item.color;
+        el.style.left = Math.random() * 100 + 'vw';
 
-                        document.body.appendChild(el);
-                        setTimeout(() => el.remove(), (duration + 2) * 1000);
-                    }
-                }
+        const duration = Math.random() * 3 + 2;
+        el.style.animationDuration = duration + 's';
+        el.style.animationDelay = Math.random() * 2 + 's';
+        el.style.fontSize = (Math.random() * 20 + 20) + 'px';
+
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), (duration + 2) * 1000);
+    }
+}
 
                 // --- Applica stato party ---
                 function applyParty(active, locked) {

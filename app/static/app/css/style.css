@@ -510,6 +510,11 @@ main {
     transition: all 0.6s ease;
 }
 
+.cp-icon i {
+    color: #ffee07;
+    font-size: 1.1rem;
+}
+
 .cp-icon {
     position: absolute;
     top: 1px;
@@ -650,4 +655,113 @@ main {
     pointer-events: none; /* L'utente può cliccare attraverso le banane */
     animation: fall linear forwards;
     font-size: 2rem;
+}
+
+/* =========================================================
+   BANNER ANNIVERSARIO
+   ========================================================= */
+.anniv-banner {
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    padding: 1.75rem 1.5rem 1.5rem;
+    border: 1px solid var(--accent-color);
+    border-radius: 20px;
+    text-align: center;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--nav-bg) 0%, #3b2a8c 100%);
+    box-shadow: 0 8px 24px rgba(22, 12, 68, 0.25);
+}
+
+.anniv-banner .btn-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    opacity: 0.7;
+}
+
+.anniv-banner .btn-close:hover {
+    opacity: 1;
+}
+
+.anniv-number {
+    display: inline-block;
+    font-family: 'Outfit', sans-serif;
+    font-size: 4.5rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--accent-color);
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.anniv-number:hover {
+    transform: scale(1.08) rotate(-4deg);
+}
+
+.anniv-title {
+    margin: 0.25rem 0 0.75rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.anniv-text {
+    max-width: 560px;
+    margin: 0 auto;
+    font-size: 0.98rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.anniv-toast {
+    margin-top: 1rem;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+/* Party Mode */
+[data-theme="party"] .anniv-banner {
+    background: linear-gradient(135deg, #ff00ff 0%, #a200ff 100%);
+    border: 2px solid #ffee07;
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
+}
+
+[data-theme="party"] .anniv-number {
+    color: #ffee07;
+    text-shadow: 0 0 10px #ffee07, 0 0 30px #ff00ff;
+}
+
+[data-theme="party"] .anniv-title {
+    text-shadow: 0 0 8px #ffffff, 0 0 20px #0b012a;
+}
+
+[data-theme="party"] .anniv-toast {
+    color: #ffee07;
+}
+
+/* Coriandoli */
+.confetti-piece {
+    position: fixed;
+    top: -20px;
+    z-index: 9998;
+    width: 8px;
+    height: 14px;
+    pointer-events: none;
+    animation: confetti-fall linear forwards;
+}
+
+@keyframes confetti-fall {
+    to {
+        transform: translate(var(--drift, 0), 110vh) rotate(720deg);
+        opacity: 0.9;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .confetti-piece { display: none; }
+    .anniv-number { transition: none; }
 }
