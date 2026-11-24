@@ -1,30 +1,288 @@
 {% extends "app/base.html" %}
+{% block title %}Login - BARMCC{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* =========================================================
+       BARRE BLU (NAVBAR & FOOTER) IDENTICHE NELLA PAGINA LOGIN
+       ========================================================= */
+    .navbase,
+    .footer-bar {
+        height: 48px !important;
+        min-height: 48px !important;
+        padding: 0 !important;
+    }
+
+    /* =========================================================
+       LAYOUT & CARD LOGIN (NO BOOTSTRAP)
+       ========================================================= */
+    .login-wrapper {
+        width: 100%;
+        padding: 1.5rem 1.25rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .login-box {
+        width: 100%;
+        max-width: 400px;
+        background-color: var(--card-bg, #ffffff);
+        color: var(--card-text, #212529);
+        border: 1px solid var(--border-color, rgba(0, 0, 0, 0.08));
+        border-radius: 22px;
+        padding: 2.5rem 2rem;
+        box-shadow: 0 12px 32px rgba(22, 12, 68, 0.08);
+    }
+
+    /* Header */
+    .login-header {
+        text-align: center;
+        margin-bottom: 2.25rem;
+    }
+
+    .login-icon {
+        width: 58px;
+        height: 58px;
+        margin: 0 auto 1rem;
+        border-radius: 16px;
+        background-color: var(--nav-bg, #160c44);
+        color: var(--accent-color, #ffc107);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+    }
+
+    .login-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        margin: 0 0 0.35rem;
+    }
+
+    .login-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-muted, #6c757d);
+        margin: 0;
+    }
+
+    /* Campi Form */
+    .field-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .field-label {
+        display: block;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted, #6c757d);
+        margin-bottom: 0.6rem;
+        padding-left: 2px;
+    }
+
+    .input-box {
+        display: flex;
+        align-items: center;
+        gap: 14px; /* Spazio netto tra icona e testo/placeholder */
+        height: 52px;
+        padding: 0 16px;
+        background-color: var(--surface-bg, #f8fafc);
+        border: 1.5px solid var(--border-color, #dce3eb);
+        border-radius: 14px;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+    }
+
+    .input-box:focus-within {
+        border-color: var(--nav-bg, #160c44);
+        background-color: var(--card-bg, #ffffff);
+        box-shadow: 0 0 0 4px rgba(22, 12, 68, 0.08);
+    }
+
+    .input-icon {
+        font-size: 1.15rem;
+        color: var(--text-muted, #6c757d);
+        flex-shrink: 0;
+        transition: color 0.2s ease;
+    }
+
+    .input-box:focus-within .input-icon {
+        color: var(--nav-bg, #160c44);
+    }
+
+    .field-input {
+        width: 100%;
+        height: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        color: var(--card-text, #212529);
+        font-size: 1rem; /* 16px: evita lo zoom automatico su iPhone */
+        letter-spacing: 0.01em;
+    }
+
+    .field-input::placeholder {
+        color: #9aa5b1;
+    }
+
+    /* Bottone occhio password */
+    .eye-btn {
+        background: none;
+        border: none;
+        padding: 6px;
+        margin-right: -4px;
+        color: var(--text-muted, #6c757d);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        transition: color 0.2s ease;
+    }
+
+    .eye-btn:hover {
+        color: var(--card-text, #212529);
+    }
+
+    /* Bottone Accedi */
+    .login-submit {
+        width: 100%;
+        height: 52px;
+        margin-top: 0.75rem;
+        border: none;
+        border-radius: 14px;
+        background-color: var(--nav-bg, #160c44);
+        color: #ffffff;
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.05rem;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: transform 0.12s ease, opacity 0.2s ease;
+    }
+
+    .login-submit:hover {
+        opacity: 0.92;
+    }
+
+    .login-submit:active {
+        transform: scale(0.98);
+    }
+
+    /* Supporto Party Mode */
+    [data-theme="party"] .login-box {
+        border: 2px solid var(--accent-color);
+        box-shadow: 0 0 25px rgba(255, 0, 255, 0.35);
+    }
+
+    [data-theme="party"] .input-box {
+        background-color: rgba(0, 0, 0, 0.25);
+        border-color: var(--accent-color);
+    }
+
+    [data-theme="party"] .input-box:focus-within {
+        box-shadow: 0 0 12px rgba(255, 0, 255, 0.4);
+    }
+
+    [data-theme="party"] .input-box:focus-within .input-icon {
+        color: #00ffcc;
+    }
+
+    [data-theme="party"] .login-submit {
+        background-color: var(--accent-color);
+        color: var(--accent-contrast);
+    }
+
+    @media (max-width: 420px) {
+        .login-box {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <div class="container p-4 card">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <h2 class="mb-4">Login</h2>
-                <form method="post" action="{% url 'app:login' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="username" class="form-label">Username</label>
-                        <input type="text"
-                               class="form-control"
-                               id="username"
-                               name="username"
-                               required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password"
-                               class="form-control"
-                               id="password"
-                               name="password"
-                               required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                </form>
+<div class="login-wrapper">
+    <div class="login-box">
+        <div class="login-header">
+            <div class="login-icon">
+                <i class="bi bi-cup-straw"></i>
             </div>
+            <h1 class="login-title">BARMCC</h1>
+            <p class="login-subtitle">Accedi al tuo account</p>
         </div>
+
+        <form method="post" action="{% url 'app:login' %}">
+            {% csrf_token %}
+
+            <div class="field-group">
+                <label for="username" class="field-label">Username</label>
+                <div class="input-box">
+                    <i class="bi bi-person input-icon"></i>
+                    <input type="text"
+                           class="field-input"
+                           id="username"
+                           name="username"
+                           placeholder="Inserisci il tuo username"
+                           autocomplete="username"
+                           autocapitalize="none"
+                           required>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <label for="password" class="field-label">Password</label>
+                <div class="input-box">
+                    <i class="bi bi-lock input-icon"></i>
+                    <input type="password"
+                           class="field-input"
+                           id="password"
+                           name="password"
+                           placeholder="Inserisci la password"
+                           autocomplete="current-password"
+                           required>
+                    <button type="button"
+                            class="eye-btn"
+                            id="togglePassword"
+                            aria-label="Mostra password">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 1.25rem;">
+                <a href="{% url 'app:password_reset' %}"
+                   style="font-size: 0.88rem; color: var(--text-muted, #6c757d); text-decoration: none;">
+                    Hai dimenticato la password?
+                </a>
+            </div>
+
+            <button type="submit" class="login-submit">
+                <span>Accedi</span>
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        </form>
     </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleBtn = document.getElementById('togglePassword');
+    const pwdInput = document.getElementById('password');
+    if (toggleBtn && pwdInput) {
+        toggleBtn.addEventListener('click', function () {
+            const isPwd = pwdInput.type === 'password';
+            pwdInput.type = isPwd ? 'text' : 'password';
+            this.querySelector('i').className = isPwd ? 'bi bi-eye-slash' : 'bi bi-eye';
+        });
+    }
+});
+</script>
 {% endblock %}

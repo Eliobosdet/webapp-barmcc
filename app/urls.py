@@ -3,6 +3,9 @@ from . import views
 from django.conf import settings
 from django.conf.urls.static import static
 from .decorators import partner_required
+from django.contrib.auth import views as auth_views
+from django.urls import path, reverse_lazy
+from .forms import CustomPasswordResetForm
 
 app_name = "app"
 
@@ -53,4 +56,37 @@ urlpatterns = [
     path("api/orders/export/", views.export_orders_api, name="export_orders_api"),
     path("api/check-party-mode/", views.check_party_mode, name="check_party_mode"),
     path("api/set-party-mode/", views.toggle_party_mode, name="set_party_mode"),
+    path(
+        "password-reset/",
+        auth_views.PasswordResetView.as_view(
+            template_name="app/emails/password_reset_form.html",
+            email_template_name="app/emails/password_reset_email.html",
+            subject_template_name="app/emails/password_reset_subject.txt",
+            form_class=CustomPasswordResetForm,
+            success_url=reverse_lazy("app:password_reset_done"),
+        ),
+        name="password_reset",
+    ),
+    path(
+        "password-reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="app/emails/password_reset_done.html",
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "password-reset-confirm/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="app/emails/password_reset_confirm.html",
+            success_url=reverse_lazy("app:password_reset_complete"),
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "password-reset-complete/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="app/emails/password_reset_complete.html",
+        ),
+        name="password_reset_complete",
+    ),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

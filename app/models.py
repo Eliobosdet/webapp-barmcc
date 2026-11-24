@@ -56,6 +56,9 @@ class Person(models.Model):
     # save capitalized
     def save(self, *args, **kwargs):
         # 1. Capitalizzazione nomi (il tuo codice esistente)
+        if self.user and self.user.email and self.user.email != self.email:
+            self.user.email = self.email
+            self.user.save(update_fields=["email"])
         if self.first_name:
             self.first_name = " ".join(p.capitalize() for p in self.first_name.split())
         if self.last_name:
